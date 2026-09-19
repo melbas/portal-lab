@@ -87,9 +87,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
 
 /* ================================================================
-   VARIANTE 1 — INSTANT  ·  parcours complet d'achat
-   Accueil forfaits → Téléphone → Code SMS → Paiement → Accès.
-   Charte PremiumConnect (thème clair). 1 décision par écran.
+   VARIANTE 1 — INSTANT  ·  parcours d'achat
+   Deux flux séparés :
+     - forfait GRATUIT  → téléphone + code SMS (la loi exige
+       d'identifier l'utilisateur d'un réseau offert).
+     - forfait PAYANT   → paiement wallet direct (le wallet envoie
+       le hook de validation au serveur ; pas de SMS).
    ================================================================ */
 #v-instant {
   --pc-violet: #5B4DFF;
@@ -121,6 +124,22 @@ button { font: inherit; color: inherit; cursor: pointer; }
   padding: 6px 11px; border-radius: 999px;
   background: var(--pc-card); border: 1px solid var(--pc-line);
   font-size: .72rem; font-weight: 700; color: var(--pc-muted);
+}
+
+/* ---- retour / correction ---- */
+.in2-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-bottom: 14px;
+  border: 1px solid var(--pc-line); background: var(--pc-card);
+  color: var(--pc-muted); padding: 8px 15px; border-radius: 999px;
+  font-size: .8rem; font-weight: 700;
+  transition: color var(--dur-hover) var(--ease-out),
+              background-color var(--dur-hover) var(--ease-out),
+              transform var(--dur-press) var(--ease-out);
+}
+.in2-back:active { transform: scale(.96); }
+@media (hover: hover) and (pointer: fine) {
+  .in2-back:hover { color: var(--pc-ink); background: var(--pc-track); }
 }
 
 /* ---- vues (étapes) ---- */
@@ -176,6 +195,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .in2-pack .price .p { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; }
 .in2-pack .price .u { font-size: .66rem; color: var(--pc-muted); font-weight: 700; }
 .in2-pack.free .price .p { color: #0d9b5c; }
+
+/* ---- note sur les deux flux ---- */
+.in2-note {
+  margin-top: 16px; padding: 12px 14px; border-radius: 14px;
+  background: rgba(91,77,255,.06); border: 1px solid #ddd8ff;
+  font-size: .74rem; color: var(--pc-muted); line-height: 1.55;
+}
+.in2-note b { color: var(--pc-ink); }
 
 /* ---- inputs / keypad ---- */
 .in2-field {
@@ -461,6 +488,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .ec2-mission[data-kind="sponsor"] .ic svg { stroke: var(--pc-coral); }
 .ec2-mission[data-kind="ref"] .ic { background: rgba(16,185,129,.12); }
 .ec2-mission[data-kind="ref"] .ic svg { stroke: #0d9b5c; }
+.ec2-mission[data-kind="havecode"] .ic { background: rgba(91,77,255,.12); }
+.ec2-mission[data-kind="havecode"] .ic svg { stroke: var(--pc-violet); }
 .ec2-mission .t { font-size: .94rem; font-weight: 700; }
 .ec2-mission .d { font-size: .76rem; color: var(--pc-muted); margin-top: 2px; line-height: 1.4; }
 .ec2-mission .gain {
@@ -498,6 +527,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   box-shadow: 0 10px 30px -18px rgba(25,25,51,.35);
 }
 .ec2-q { font-size: 1.02rem; font-weight: 700; line-height: 1.35; }
+.ec2-prog { margin-bottom: 12px; font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pc-violet); }
 .ec2-opts { margin-top: 16px; display: grid; gap: 8px; }
 .ec2-opt {
   width: 100%; text-align: left;
@@ -536,7 +566,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .ec2-ring-hint { margin-top: 14px; font-size: .8rem; color: var(--pc-muted); line-height: 1.5; text-align: center; }
 .ec2-ring-hint b { color: var(--pc-coral); }
 
-/* Parrainage */
+/* Parrainage — partage */
 .ec2-ref-code {
   margin-top: 4px; padding: 15px; border-radius: 14px;
   border: 1px dashed #cfc9f5; background: #fafaff;
@@ -548,10 +578,49 @@ button { font: inherit; color: inherit; cursor: pointer; }
   background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
   color: #fff; font-size: .8rem; font-weight: 700;
   box-shadow: 0 5px 12px -6px rgba(91,77,255,.8);
+  display: inline-flex; align-items: center; gap: 6px;
 }
 .ec2-copy.done { background: #10b981; }
 .ec2-copy:active { transform: scale(.96); }
+.ec2-ref-share { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.ec2-wa {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px; border-radius: 12px; border: 1px solid var(--pc-line);
+  background: var(--pc-card); color: var(--pc-ink);
+  font-size: .82rem; font-weight: 700; text-decoration: none;
+  transition: background-color var(--dur-hover) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.ec2-wa:active { transform: scale(.96); }
+.ec2-wa svg { width: 15px; height: 15px; }
+@media (hover: hover) and (pointer: fine) { .ec2-wa:hover { background: var(--pc-track); } }
 .ec2-hint { margin-top: 12px; font-size: .8rem; color: var(--pc-muted); line-height: 1.5; }
+
+/* Saisie d'un code (havecode) */
+.ec2-codefield {
+  padding: 15px; border-radius: 14px; border: 1.5px dashed #cfc9f5;
+  background: #fafaff; text-align: center;
+  font-size: 1.3rem; font-weight: 800; letter-spacing: .14em; min-height: 54px;
+  color: var(--pc-ink); word-break: break-all;
+}
+.ec2-codefield.err { border-color: rgba(255,77,106,.7); background: rgba(255,77,106,.06); }
+.ec2-pad { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ec2-key2 {
+  padding: 13px 0; border: 0; border-radius: 13px;
+  background: #fafaff; border: 1px solid var(--pc-line);
+  font-size: 1.15rem; font-weight: 700; color: var(--pc-ink);
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-press) var(--ease-out);
+}
+.ec2-key2:active { transform: scale(.94); background: var(--pc-track); }
+.ec2-key2.fn { color: var(--pc-muted); font-size: .8rem; }
+.ec2-key2.fn:active { color: var(--pc-coral); background: rgba(255,77,106,.09); }
+.ec2-key2.go {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff; font-size: .9rem; box-shadow: 0 8px 16px -8px rgba(91,77,255,.9);
+}
+.ec2-code-msg { margin-top: 11px; font-size: .8rem; font-weight: 700; text-align: center; color: var(--pc-muted); }
+.ec2-code-msg.ok { color: #0d9b5c; }
+.ec2-code-msg.bad { color: #e53e6b; }
 
 /* ============ CTA connexion fixe ============ */
 .ec2-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; padding: 12px 18px calc(12px + var(--safe-b)); background: linear-gradient(to top, var(--pc-bg) 62%, rgba(245,245,251,0)); }
@@ -640,8 +709,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 <div id="app">
 
 <!-- ================================================================
-     VARIANTE 1 — INSTANT · parcours complet d'achat
-     Accueil forfaits → Téléphone → Code SMS → Paiement → Accès.
+     VARIANTE 1 — INSTANT · parcours d'achat
+     Gratuit  → téléphone + code SMS (identification légale).
+     Payant   → wallet direct (le wallet valide et active).
      ================================================================ -->
 <section id="v-instant" class="variant active">
   <div class="inner">
@@ -683,14 +753,19 @@ button { font: inherit; color: inherit; cursor: pointer; }
           <span class="price"><span class="p">2000 F</span><span class="u">7 jours</span></span>
         </button>
       </div>
+      <div class="in2-note">
+        <b>Offre gratuite</b> : identification par SMS exigée (le réseau est offert, la loi veut qu'on sache qui s'y connecte).<br>
+        <b>Forfaits payants</b> : pas de SMS — c'est ton wallet (Wave, Orange, Free) qui valide le paiement et active le forfait.
+      </div>
       <div class="in2-cta">
         <button class="in2-build" id="inBuild"><span id="inBuildLabel">Choisis un forfait</span></button>
         <p class="in2-hint">Paiement sécurisé · reçu par SMS · sans engagement</p>
       </div>
     </div>
 
-    <!-- 2 · TÉLÉPHONE -->
+    <!-- 2 · TÉLÉPHONE (gratuit uniquement) -->
     <div class="in2-view rise" id="inPhone">
+      <button class="in2-back btn-press" data-back="inHome">← Retour</button>
       <div class="in2-hero">
         <h1>Ton<br><b>numéro de téléphone</b></h1>
         <p>C'est ton compte. On t'envoie un code par SMS pour confirmer.</p>
@@ -719,8 +794,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
       <p class="in2-hint">Aucun mot de passe à retenir. Ton numéro suffit.</p>
     </div>
 
-    <!-- 3 · CODE SMS -->
+    <!-- 3 · CODE SMS (gratuit uniquement) -->
     <div class="in2-view rise" id="inCode">
+      <button class="in2-back btn-press" data-back="inPhone">← Modifier le numéro</button>
       <div class="in2-hero">
         <h1>Code de<br><b>confirmation</b></h1>
         <p>On a envoyé un code à 4 chiffres au <b id="inCodePhone" class="mono"></b></p>
@@ -744,11 +820,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
       <p class="in2-hint code">Pas reçu ? <button id="inResend" style="border:0;background:none;color:var(--pc-violet);font-weight:700;font:inherit">Renvoyer le code</button></p>
     </div>
 
-    <!-- 4 · PAIEMENT -->
+    <!-- 4 · PAIEMENT (payant uniquement) -->
     <div class="in2-view rise" id="inPay">
+      <button class="in2-back btn-press" data-back="inHome">← Retour</button>
       <div class="in2-hero">
         <h1>Règle ton<br><b>forfait</b></h1>
-        <p>Un seul écran, un seul geste. Tu vois le montant exact avant de valider.</p>
+        <p>Tu vois le montant exact avant de valider. C'est le wallet qui active le forfait.</p>
       </div>
       <div class="in2-sum" id="inSummary"></div>
       <div class="in2-sec"><span>Mode de paiement</span><i></i></div>
@@ -771,7 +848,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
       </div>
       <div class="in2-cta">
         <button class="in2-build live btn-press" id="inPayBtn"><span id="inPayLabel">Payer 500 F</span></button>
-        <p class="in2-hint">Ton forfait s'active tout seul après la validation.</p>
+        <p class="in2-hint">Le forfait s'active tout seul dès que le wallet confirme.</p>
       </div>
     </div>
 
@@ -783,8 +860,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
         <p class="meta rise">Forfait <b id="inPackName">24 heures</b> actif</p>
         <p class="meta rise mono" style="font-size:1.05rem"><b id="inClock">23:59:58</b></p>
         <div class="row rise">
-          <div class="stat"><p class="k">Numéro</p><p class="v mono" id="inStatPhone">+221 •••</p></div>
-          <div class="stat"><p class="k">Reçu</p><p class="v" id="inStatAmt">500 F</p></div>
+          <div class="stat"><p class="k" id="inStatK1">Numéro</p><p class="v mono" id="inStatPhone">+221 •••</p></div>
+          <div class="stat"><p class="k" id="inStatK2">Reçu</p><p class="v" id="inStatAmt">500 F</p></div>
         </div>
         <button class="in2-reset btn-press" id="inReset">↺ Refaire le parcours</button>
       </div>
@@ -885,7 +962,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
       <div class="ec2-missions" id="ecMissions">
         <button class="ec2-mission btn-press" data-kind="quiz">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></span>
-          <span><span class="t">1 question</span><span class="d">15 secondes</span></span>
+          <span><span class="t">2 questions</span><span class="d">20 secondes</span></span>
           <span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
           <span class="gain">+10 min</span>
         </button>
@@ -902,6 +979,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
           <span><span class="t">Inviter un proche</span><span class="d">Partage ton code</span></span>
           <span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
           <span class="gain">+15 min</span>
+        </button>
+
+        <button class="ec2-mission btn-press" data-kind="havecode">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 7h16v4a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M9 7v13" stroke-dasharray="2 3"/></svg></span>
+          <span><span class="t">J'ai un code parrainage</span><span class="d">Entre le code d'un proche</span></span>
+          <span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span class="gain">+5 min</span>
         </button>
       </div>
 
@@ -1013,6 +1097,7 @@ function showView(id) {
   inViews.forEach(v => v.classList.toggle("show", v.id === id));
   window.scrollTo({ top: 0, behavior: "auto" });
 }
+function fmtPhone(n) { return n.replace(/(\d{2})(?=\d)/g, "$1 ").trim(); }
 
 /* ---- Étape 1 : forfaits ---- */
 inPacks.querySelectorAll(".in2-pack").forEach(c => {
@@ -1033,19 +1118,41 @@ inPacks.querySelectorAll(".in2-pack").forEach(c => {
   });
 });
 
+/* ---- Lancement : deux flux selon gratuit/payant ---- */
 inBuild.addEventListener("click", () => {
   if (!pack) return;
-  phone = ""; code = "";
-  inPhoneI.value = "";
-  inCodeI.value = "";
-  showView("inPhone");
+  if (pack.price === 0) {
+    /* GRATUIT : identification par SMS exigée (réseau offert). */
+    phone = ""; code = "";
+    inPhoneI.value = "";
+    inCodeI.value = "";
+    showView("inPhone");
+  } else {
+    /* PAYANT : pas de SMS. Le wallet valide et active. */
+    phone = ""; code = "";
+    inCodeI.value = "";
+    buildSummary();
+    showView("inPay");
+  }
 });
 
-/* ---- Étape 2 : téléphone (clavier tactile) ---- */
+/* ---- Boutons retour / correction ---- */
+document.querySelectorAll(".in2-back").forEach(b => {
+  b.addEventListener("click", () => {
+    const to = b.dataset.back;
+    if (to === "inPhone") {
+      /* Retour en gardant le numéro tapé : on corrige avec ⌫. */
+      inPhoneI.value = fmtPhone(phone);
+    }
+    showView(to);
+  });
+});
+
+/* ---- Étape 2 : téléphone (clavier tactile, TV-friendly) ---- */
 function pressDigit(d) {
   if (phone.length >= 9) return;
   phone += d;
-  inPhoneI.value = phone.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+  inPhoneI.value = fmtPhone(phone);
   if (phone.length === 9) {
     const h = setTimeout(() => goCode(), 380);
     timers.push(h);
@@ -1054,11 +1161,11 @@ function pressDigit(d) {
 function backspace() {
   if (!phone) return;
   phone = phone.slice(0, -1);
-  inPhoneI.value = phone.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+  inPhoneI.value = fmtPhone(phone);
 }
 function goCode() {
   if (phone.length !== 9) return;
-  inCodePh.textContent = "+221 " + phone.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+  inCodePh.textContent = "+221 " + fmtPhone(phone);
   showView("inCode");
 }
 document.querySelectorAll("#inKeys .in2-key[data-k]").forEach(b => {
@@ -1067,13 +1174,13 @@ document.querySelectorAll("#inKeys .in2-key[data-k]").forEach(b => {
 document.getElementById("inBack").addEventListener("click", backspace);
 document.getElementById("inNext").addEventListener("click", goCode);
 
-/* ---- Étape 3 : code SMS ---- */
+/* ---- Étape 3 : code SMS (gratuit uniquement) ---- */
 function pressCodeDigit(d) {
   if (code.length >= 4) return;
   code += d;
   inCodeI.value = code;
   if (code.length === 4) {
-    const h = setTimeout(() => goPay(), 350);
+    const h = setTimeout(() => grantAccess(), 350);   /* accès direct : pas de paiement */
     timers.push(h);
   }
 }
@@ -1082,22 +1189,10 @@ function codeBackspace() {
   code = code.slice(0, -1);
   inCodeI.value = code;
 }
-function goPay() {
-  if (code.length !== 4) return;
-  if (pack.price === 0) return grantAccess();   /* forfait gratuit : pas de paiement */
-  inSummary.innerHTML =
-    '<div class="r"><span>Forfait</span><b>' + pack.name + '</b></div>' +
-    '<div class="r"><span>Durée</span><b>' + pack.unit + '</b></div>' +
-    '<div class="r"><span>Numéro</span><b class="mono">+221 ' + phone + '</b></div>' +
-    '<div class="r tot"><span>Total à payer</span><b>' + pack.price + ' F</b></div>';
-  inPayL.textContent = "Payer " + pack.price + " F";
-  showView("inPay");
-}
 document.querySelectorAll("#inCodeKeys .in2-key[data-k]").forEach(b => {
   b.addEventListener("click", () => pressCodeDigit(b.dataset.k));
 });
 document.getElementById("inCodeBack").addEventListener("click", codeBackspace);
-document.getElementById("inCodeNext").addEventListener("click", goPay);
 
 /* Renvoi de code (simulé) */
 document.getElementById("inResend").addEventListener("click", (e) => {
@@ -1108,7 +1203,15 @@ document.getElementById("inResend").addEventListener("click", (e) => {
   timers.push(h);
 });
 
-/* ---- Étape 4 : paiement ---- */
+/* ---- Étape 4 : paiement wallet (payant uniquement) ---- */
+function buildSummary() {
+  inSummary.innerHTML =
+    '<div class="r"><span>Forfait</span><b>' + pack.name + '</b></div>' +
+    '<div class="r"><span>Durée</span><b>' + pack.unit + '</b></div>' +
+    '<div class="r tot"><span>Total à payer</span><b>' + pack.price + ' F</b></div>';
+  inPayL.textContent = "Payer " + pack.price + " F";
+}
+
 document.querySelectorAll("#inPays .in2-pay").forEach(b => {
   b.addEventListener("click", () => {
     document.querySelectorAll("#inPays .in2-pay").forEach(x => x.classList.remove("sel"));
@@ -1128,8 +1231,17 @@ inPayBtn.addEventListener("click", () => {
 /* ---- Étape 5 : accès ---- */
 function grantAccess() {
   document.getElementById("inPackName").textContent = pack.name;
-  document.getElementById("inStatPhone").textContent = "+221 " + phone.slice(0, 3) + " " + phone.slice(3, 5) + " " + phone.slice(5, 7) + " " + phone.slice(7);
-  document.getElementById("inStatAmt").textContent = pack.price === 0 ? "Gratuit" : pack.price + " F";
+  if (pack.price === 0) {
+    document.getElementById("inStatK1").textContent = "Numéro";
+    document.getElementById("inStatPhone").textContent = "+221 " + phone.slice(0, 3) + " " + phone.slice(3, 5) + " " + phone.slice(5, 7) + " " + phone.slice(7);
+    document.getElementById("inStatK2").textContent = "Identification";
+    document.getElementById("inStatAmt").textContent = "Par SMS ✓";
+  } else {
+    document.getElementById("inStatK1").textContent = "Validé par";
+    document.getElementById("inStatPhone").textContent = payMethod;
+    document.getElementById("inStatK2").textContent = "Montant";
+    document.getElementById("inStatAmt").textContent = pack.price + " F";
+  }
   showView("inDone");
   runClock(document.getElementById("inClock"), pack.min * 60);
 }
@@ -1160,8 +1272,8 @@ scGo.addEventListener("click", () => {
 });
 
 /* ==================== V3 — ÉCHANGE (PremiumConnect) ==================== */
-const GAIN   = { quiz: 10, sponsor: 20, ref: 15 };
-const KIND   = { quiz: "Quiz", sponsor: "Sponsor", ref: "Parrainage" };
+const GAIN   = { quiz: 10, sponsor: 20, ref: 15, havecode: 5 };
+const KIND   = { quiz: "Quiz", sponsor: "Sponsor", ref: "Parrainage", havecode: "Code parrainage" };
 const GOAL   = 30;   /* graduation de la jauge (max affiché) */
 const UNLOCK = 10;   /* 1 mission suffit à débloquer internet */
 
@@ -1280,25 +1392,37 @@ function renderTask(kind) {
   if (kind === "quiz") return renderQuiz();
   if (kind === "sponsor") return renderSponsor();
   if (kind === "ref") return renderRef();
+  if (kind === "havecode") return renderHaveCode();
 }
 
-/* QUIZ */
-const QUIZ = {
-  q: "Pourquoi tu te connectes au WiFi ?",
-  opts: [
-    { t: "Contacter ma famille", ok: true },
-    { t: "Travailler", ok: false },
-    { t: "Me divertir", ok: false }
-  ]
-};
+/* QUIZ — 2 questions */
+const QUIZ = [
+  { q: "Pourquoi tu te connectes au WiFi ?",
+    opts: [ { t: "Contacter ma famille", ok: true },
+            { t: "Travailler", ok: false },
+            { t: "Me divertir", ok: false } ] },
+  { q: "Quel partenaire finance ton WiFi ?",
+    opts: [ { t: "WariTel", ok: true },
+            { t: "SunuTel", ok: false },
+            { t: "Teranga Mobile", ok: false } ] }
+];
+let qIdx = 0;
 function renderQuiz() {
+  qIdx = 0;
+  renderQuizQ();
+}
+function renderQuizQ() {
+  const item = QUIZ[qIdx];
   ecCardBody.innerHTML = "";
+  const prog = document.createElement("p");
+  prog.className = "ec2-prog";
+  prog.textContent = "Question " + (qIdx + 1) + " / " + QUIZ.length;
   const q = document.createElement("p");
   q.className = "ec2-q";
-  q.textContent = QUIZ.q;
+  q.textContent = item.q;
   const opts = document.createElement("div");
   opts.className = "ec2-opts";
-  QUIZ.opts.forEach((o, i) => {
+  item.opts.forEach((o, i) => {
     const b = document.createElement("button");
     b.className = "ec2-opt btn-press";
     b.innerHTML = '<span class="key">' + "ABC"[i] + '</span><span>' + o.t + "</span>";
@@ -1306,13 +1430,18 @@ function renderQuiz() {
       [...opts.children].forEach(x => x.disabled = true);
       b.classList.add(o.ok ? "ok" : "no");
       if (o.ok) {
-        const card = ecMissions.querySelector('[data-kind="quiz"]');
-        card.classList.add("done");
-        closeTaskSoon(650);
-        const h = setTimeout(() => award("quiz", card), 260);
-        timers.push(h);
+        if (qIdx < QUIZ.length - 1) {
+          const h = setTimeout(() => { qIdx++; renderQuizQ(); }, 750);
+          timers.push(h);
+        } else {
+          const card = ecMissions.querySelector('[data-kind="quiz"]');
+          card.classList.add("done");
+          closeTaskSoon(650);
+          const h = setTimeout(() => award("quiz", card), 260);
+          timers.push(h);
+        }
       } else {
-        [...opts.children].forEach((x, j) => { if (QUIZ.opts[j].ok) x.classList.add("ok"); });
+        [...opts.children].forEach((x, j) => { if (item.opts[j].ok) x.classList.add("ok"); });
         const h = setTimeout(() => {
           [...opts.children].forEach(x => { x.disabled = false; x.classList.remove("ok", "no"); });
         }, 1500);
@@ -1321,7 +1450,7 @@ function renderQuiz() {
     });
     opts.appendChild(b);
   });
-  ecCardBody.append(q, opts);
+  ecCardBody.append(prog, q, opts);
 }
 
 /* SPONSOR : anneau de 5s */
@@ -1360,7 +1489,7 @@ function renderSponsor() {
   timers.push(ringIv);
 }
 
-/* PARRAINAGE */
+/* PARRAINAGE — code + lien WhatsApp */
 function renderRef() {
   ecCardBody.innerHTML = "";
   const code = "PC-" + Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -1394,10 +1523,89 @@ function renderRef() {
     }
   });
   box.appendChild(cp);
+
+  /* Partage par lien (WhatsApp / autre) */
+  const shareRow = document.createElement("div");
+  shareRow.className = "ec2-ref-share";
+  const wa = document.createElement("a");
+  wa.className = "ec2-wa btn-press";
+  wa.href = "https://wa.me/?text=" + encodeURIComponent(
+    "Mon code WiFi PremiumConnect : " + code +
+    " — entre-le sur le portail, 5 min offertes !"
+  );
+  wa.target = "_blank";
+  wa.rel = "noopener";
+  wa.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm4.6 4.2c-.2 0-.5 0-.7.4-.2.4-1 1.2-1.2 1.5-.1.1-.2.1-.4 0-.7-.3-1.4-.7-2-1.6-.1-.2 0-.4.1-.5l.3-.4c.1-.2.1-.3 0-.5l-.5-1.2c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.7.7-.7 1.7-.6 2.1.4 1.5 1.8 2.8 2.5 3.2.4.2.7.3 1 .1.3-.2.4-.5.5-.8.1-.2.2-.2.4-.1.5.2 1.5.8 1.7 1 .2.2.2.3.1.5-.1.4-.6 1-.7 1.2-.1.2-.3.3-.5.2-.5-.2-1.3-.5-2.2-1.2-1.6-1.2-2.4-2.8-2.5-3.1-.1-.3 0-.5.1-.6z"/></svg> WhatsApp';
+  shareRow.appendChild(wa);
+  box.appendChild(shareRow);
+
   const hint = document.createElement("p");
   hint.className = "ec2-hint";
-  hint.textContent = "Ton proche entre ce code à sa connexion : il gagne 10 min, tu gagnes 15 min.";
+  hint.innerHTML = "Ton proche entre ce code dans <b>« J'ai un code parrainage »</b> : il gagne 5 min, tu gagnes 15 min.";
   ecCardBody.append(box, hint);
+}
+
+/* HAVECODE — saisir un code reçu */
+function renderHaveCode() {
+  ecCardBody.innerHTML = "";
+  let buf = "";
+
+  const field = document.createElement("div");
+  field.className = "ec2-codefield mono";
+  field.textContent = "";
+
+  const msg = document.createElement("p");
+  msg.className = "ec2-code-msg";
+  msg.textContent = "Saisis le code que ton proche t'a envoyé.";
+
+  const pad = document.createElement("div");
+  pad.className = "ec2-pad";
+
+  function refresh() {
+    field.textContent = buf;
+    field.classList.remove("err");
+    msg.className = "ec2-code-msg";
+    msg.textContent = buf
+      ? (buf.length < 4 ? "Encore " + (4 - buf.length) + " caractère(s)" : "Prêt — valide le code")
+      : "Saisis le code que ton proche t'a envoyé.";
+  }
+
+  const keys = ["1","2","3","4","5","6","7","8","9","⌫","0","OK"];
+  keys.forEach(k => {
+    const b = document.createElement("button");
+    b.className = "ec2-key2 btn-press";
+    b.textContent = k;
+    if (k === "⌫") {
+      b.classList.add("fn");
+      b.addEventListener("click", () => { buf = buf.slice(0, -1); refresh(); });
+    } else if (k === "OK") {
+      b.classList.add("go");
+      b.addEventListener("click", () => validateCode());
+    } else {
+      b.addEventListener("click", () => { if (buf.length < 8) { buf += k; refresh(); } });
+    }
+    pad.appendChild(b);
+  });
+
+  function validateCode() {
+    if (buf.length < 4) {
+      field.classList.add("err");
+      msg.className = "ec2-code-msg bad";
+      msg.textContent = "Le code est trop court (4 caractères minimum).";
+      return;
+    }
+    /* Démo : tout code de 4+ caractères est accepté. En prod, le serveur vérifie. */
+    msg.className = "ec2-code-msg ok";
+    msg.textContent = "Code " + buf + " validé — 5 min ajoutées";
+    const card = ecMissions.querySelector('[data-kind="havecode"]');
+    card.classList.add("done");
+    const h = setTimeout(() => { award("havecode", card); }, 600);
+    timers.push(h);
+    setTimeout(() => closeTaskSoon(900), 0);
+  }
+
+  ecCardBody.append(field, msg, pad);
+  refresh();
 }
 
 function closeTaskSoon(ms) {
@@ -1412,8 +1620,9 @@ ecGo.addEventListener("click", () => {
     ecPortal.style.display = "none";
     ecCtaWrap.hidden = true;
     ecOn.classList.add("show");
-    const kind = [...doneKinds][0] || "quiz";
-    document.getElementById("ecStatKind").textContent = KIND[kind];
+    const kinds = [...doneKinds];
+    document.getElementById("ecStatKind").textContent =
+      kinds.length > 1 ? kinds.length + " missions" : KIND[kinds[0] || "quiz"];
     document.getElementById("ecStatGain").textContent = "+" + earned + " min";
     runClock(document.getElementById("ecClock"), 30 * 60 + earned * 60);
   });
