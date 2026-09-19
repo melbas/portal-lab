@@ -5,31 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#09090b">
 <title>Portal Lab — 3 portails captifs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ================================================================
    PORTAL LAB — laboratoire de prototypes
-   3 portails captifs réellement différents.
-   Chrome (picker) = utilitaire. Les variantes = le produit.
    Motion : Emil Kowalski standards (courbes custom, <300ms UI,
    transform/opacity uniquement, reduced-motion, hover gate).
+   Charte : PremiumConnect (violet #5B4DFF / coral #FF4D6A,
+   gradient brand, Montserrat, cards rounded-2xl).
    ================================================================ */
 
-/* ---------- Tokens de base (communs) ---------- */
 :root {
   --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop:    cubic-bezier(0.34, 1.56, 0.64, 1);  /* atterrissage léger */
 
   --dur-press: 140ms;
   --dur-hover: 180ms;
   --dur-card:  220ms;
   --dur-page:  320ms;
-
-  --r-md: 14px;
-  --r-lg: 20px;
-
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", sans-serif;
-  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Inter", sans-serif;
 
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
@@ -38,28 +34,20 @@
 @property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { -webkit-text-size-adjust: 100%; }
-
 body {
-  min-height: 100vh;
-  min-height: 100dvh;
-  font-family: var(--font-sans);
+  min-height: 100vh; min-height: 100dvh;
+  font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
-
 button { font: inherit; color: inherit; cursor: pointer; }
 
-/* ---------- Le picker (chrome, pas candidat) ---------- */
+/* ---------- Le picker ---------- */
 #picker {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  z-index: 99;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 99;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
   padding: 8px 10px calc(8px + var(--safe-b));
   background: rgba(9, 9, 11, .82);
   backdrop-filter: blur(18px) saturate(1.4);
@@ -68,613 +56,429 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 #picker button {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 10px 4px 8px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: rgba(255, 255, 255, .42);
-  transition: color var(--dur-hover) var(--ease-out),
-              background-color var(--dur-hover) var(--ease-out);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 4px 8px; border: 0; border-radius: 12px;
+  background: transparent; color: rgba(255,255,255,.42);
+  transition: color var(--dur-hover) var(--ease-out), background-color var(--dur-hover) var(--ease-out);
   min-height: 56px;
 }
 #picker button .num { font-size: .68rem; font-weight: 700; letter-spacing: .06em; opacity: .6; }
 #picker button .nm  { font-size: .86rem; font-weight: 650; }
-#picker button[aria-selected="true"] {
-  color: #fff;
-  background: rgba(255, 255, 255, .08);
-}
+#picker button[aria-selected="true"] { color: #fff; background: rgba(255,255,255,.08); }
 #picker button[aria-selected="true"]::before {
-  content: "";
-  position: absolute;
-  top: 3px; left: 50%;
-  width: 22px; height: 2px;
-  border-radius: 2px;
-  background: var(--pick-accent, #8b5cf6);
-  transform: translateX(-50%);
+  content: ""; position: absolute; top: 3px; left: 50%;
+  width: 22px; height: 2px; border-radius: 2px;
+  background: var(--pick-accent, #8b5cf6); transform: translateX(-50%);
 }
 #picker button:active { transform: scale(.96); }
 
-/* ---------- Conteneur des variantes ---------- */
 #app { position: relative; }
-
-.variant {
-  display: none;
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding-bottom: calc(96px + var(--safe-b));
-}
+.variant { display: none; min-height: 100vh; min-height: 100dvh; padding-bottom: calc(96px + var(--safe-b)); }
 .variant.active { display: block; }
 
-/* Apparition à l'ouverture de la variante (transition, pas keyframes) */
 .variant.active .rise {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity var(--dur-page) var(--ease-out),
-              transform var(--dur-page) var(--ease-out);
+  opacity: 1; transform: translateY(0);
+  transition: opacity var(--dur-page) var(--ease-out), transform var(--dur-page) var(--ease-out);
 }
 .variant.active .rise { @starting-style { opacity: 0; transform: translateY(12px); } }
 
-/* ---------- Utilitaires partagés ---------- */
 .btn-press { transition: transform var(--dur-press) var(--ease-out); }
 .btn-press:active { transform: scale(.97); }
-
-.spinner {
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, .18);
-  border-top-color: #fff;
-  animation: spin .8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
 .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
-
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ================================================================
    VARIANTE 1 — INSTANT
-   Axe : friction zéro. Confiance d'abord, valeur après.
-   Personnalité : crisp, rapide, discret.
    ================================================================ */
 #v-instant {
   --ac: #8b5cf6;
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgba(139, 92, 246, .14), transparent 60%),
-    #09090b;
-  color: #fafafa;
-  display: none;
-  place-items: center;
+  background: radial-gradient(120% 60% at 50% -10%, rgba(139,92,246,.14), transparent 60%), #09090b;
+  color: #fafafa; display: none; place-items: center;
   padding: 24px 20px calc(96px + var(--safe-b));
 }
 #v-instant.active { display: grid; }
-
 .ins-wrap { width: 100%; max-width: 400px; }
-
-.ins-mark {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 40px;
-}
+.ins-mark { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
 .ins-mark .dot {
-  width: 34px; height: 34px;
-  border-radius: 10px;
+  width: 34px; height: 34px; border-radius: 10px;
   background: linear-gradient(140deg, #8b5cf6, #6d28d9);
-  display: grid; place-items: center;
-  box-shadow: 0 6px 18px -8px rgba(139, 92, 246, .8);
+  display: grid; place-items: center; box-shadow: 0 6px 18px -8px rgba(139,92,246,.8);
 }
 .ins-mark .dot svg { width: 18px; height: 18px; }
-.ins-mark .ssid { font-size: .9rem; font-weight: 650; letter-spacing: -.01em; }
-.ins-mark .sec { font-size: .72rem; color: rgba(255, 255, 255, .45); }
-
-.ins-hero { margin-bottom: 8px; }
-.ins-hero h1 {
-  font-size: clamp(1.7rem, 7vw, 2.1rem);
-  line-height: 1.15;
-  letter-spacing: -.03em;
-  font-weight: 700;
-}
+.ins-mark .ssid { font-size: .9rem; font-weight: 650; }
+.ins-mark .sec { font-size: .72rem; color: rgba(255,255,255,.45); }
+.ins-hero h1 { font-size: clamp(1.7rem, 7vw, 2.1rem); line-height: 1.15; letter-spacing: -.03em; font-weight: 700; }
 .ins-hero h1 em { font-style: normal; color: #c4b5fd; }
-.ins-sub { margin-top: 10px; color: rgba(255, 255, 255, .55); font-size: .92rem; line-height: 1.6; }
-
+.ins-sub { margin-top: 10px; color: rgba(255,255,255,.55); font-size: .92rem; line-height: 1.6; }
 .ins-connect {
-  margin: 34px 0 14px;
-  width: 100%;
-  padding: 17px 20px;
-  border: 0;
-  border-radius: var(--r-lg);
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 650;
-  letter-spacing: -.01em;
-  box-shadow: 0 12px 30px -12px rgba(139, 92, 246, .9), inset 0 1px 0 rgba(255, 255, 255, .25);
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: 56px;
+  margin: 34px 0 14px; width: 100%; padding: 17px 20px; border: 0; border-radius: 20px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff;
+  font-size: 1rem; font-weight: 650;
+  box-shadow: 0 12px 30px -12px rgba(139,92,246,.9), inset 0 1px 0 rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px;
 }
-.ins-connect:disabled { opacity: .7; cursor: default; }
-
-.ins-trust {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  color: rgba(255, 255, 255, .4);
-  font-size: .76rem;
-}
+.ins-connect:disabled { opacity: .7; }
+.ins-trust { display: flex; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,.4); font-size: .76rem; }
 .ins-trust svg { width: 13px; height: 13px; }
-
-/* État connecté */
-.ins-on {
-  display: none;
-  text-align: center;
-  padding-top: 8px;
-}
+.ins-on { display: none; text-align: center; padding-top: 8px; }
 .ins-on.show { display: block; }
 .ins-on .ring {
-  width: 76px; height: 76px;
-  margin: 0 auto 20px;
-  border-radius: 50%;
+  width: 76px; height: 76px; margin: 0 auto 20px; border-radius: 50%;
   display: grid; place-items: center;
-  background: rgba(52, 211, 153, .12);
-  border: 1px solid rgba(52, 211, 153, .35);
+  background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.35);
 }
 .ins-on .ring svg { width: 34px; height: 34px; stroke: #34d399; }
 .ins-on h2 { font-size: 1.35rem; letter-spacing: -.025em; font-weight: 700; }
-.ins-on .time {
-  margin-top: 6px;
-  font-size: .9rem;
-  color: rgba(255, 255, 255, .55);
-}
+.ins-on .time { margin-top: 6px; font-size: .9rem; color: rgba(255,255,255,.55); }
 .ins-on .time b { color: #34d399; font-weight: 650; }
-
-/* Offres post-connexion (la valeur arrive APRÈS) */
 .ins-offers { margin-top: 30px; text-align: left; }
-.ins-offers .lbl {
-  font-size: .7rem;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: rgba(255, 255, 255, .38);
-  margin-bottom: 10px;
-}
+.ins-offers .lbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.38); margin-bottom: 10px; }
 .ins-offers .card {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px;
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, .05);
-  border: 1px solid rgba(255, 255, 255, .09);
-  margin-bottom: 8px;
-  text-align: left;
-  width: 100%;
-  transition: background-color var(--dur-hover) var(--ease-out),
-              border-color var(--dur-hover) var(--ease-out),
-              transform var(--dur-hover) var(--ease-out);
+  display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
+  margin-bottom: 8px; text-align: left; width: 100%;
+  transition: background-color var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out), transform var(--dur-hover) var(--ease-out);
 }
-.ins-offers .card .ic {
-  width: 36px; height: 36px; flex: none;
-  border-radius: 10px;
-  background: rgba(139, 92, 246, .14);
-  display: grid; place-items: center;
-}
+.ins-offers .card .ic { width: 36px; height: 36px; flex: none; border-radius: 10px; background: rgba(139,92,246,.14); display: grid; place-items: center; }
 .ins-offers .card .ic svg { width: 17px; height: 17px; stroke: #c4b5fd; }
 .ins-offers .card .t { font-size: .9rem; font-weight: 600; }
-.ins-offers .card .d { font-size: .78rem; color: rgba(255, 255, 255, .48); margin-top: 2px; line-height: 1.45; }
+.ins-offers .card .d { font-size: .78rem; color: rgba(255,255,255,.48); margin-top: 2px; line-height: 1.45; }
 .ins-offers .card .plus { margin-left: auto; font-size: .76rem; font-weight: 700; color: #34d399; flex: none; }
 
 /* ================================================================
    VARIANTE 2 — SCÈNE
-   Axe : le portail est une affiche. Marque/sponsor au premier plan,
-   la connexion est un geste élégant.
-   Personnalité : éditoriale, lente, théâtrale (page = un moment).
    ================================================================ */
-#v-scene {
-  --ac: #f59e0b;
-  background: #0c0a14;
-  color: #fafafa;
-  overflow: hidden;
-}
+#v-scene { --ac: #f59e0b; background: #0c0a14; color: #fafafa; overflow: hidden; }
 #v-scene .atmos {
-  position: fixed;
-  inset: -20%;
-  z-index: 0;
-  pointer-events: none;
+  position: fixed; inset: -20%; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(38% 45% at 18% 12%, rgba(245, 158, 11, .20), transparent 65%),
-    radial-gradient(42% 40% at 88% 78%, rgba(217, 70, 110, .18), transparent 65%),
-    radial-gradient(50% 50% at 50% 110%, rgba(139, 92, 246, .14), transparent 70%);
+    radial-gradient(38% 45% at 18% 12%, rgba(245,158,11,.20), transparent 65%),
+    radial-gradient(42% 40% at 88% 78%, rgba(217,70,110,.18), transparent 65%),
+    radial-gradient(50% 50% at 50% 110%, rgba(139,92,246,.14), transparent 70%);
   filter: blur(8px);
 }
 #v-scene .grain {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  opacity: .035;
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 #v-scene .inner { position: relative; z-index: 1; max-width: 460px; margin: 0 auto; padding: calc(28px + var(--safe-t)) 22px calc(96px + var(--safe-b)); }
-
 .sc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
-.sc-top .kicker {
-  font-size: .66rem;
-  text-transform: uppercase;
-  letter-spacing: .22em;
-  color: rgba(255, 255, 255, .5);
-}
-.sc-top .wifi { display: flex; align-items: center; gap: 6px; font-size: .72rem; color: rgba(255, 255, 255, .45); }
-.sc-top .wifi .bar { width: 5px; border-radius: 2px; background: rgba(255, 255, 255, .35); }
+.sc-top .kicker { font-size: .66rem; text-transform: uppercase; letter-spacing: .22em; color: rgba(255,255,255,.5); }
+.sc-top .wifi { display: flex; align-items: center; gap: 6px; font-size: .72rem; color: rgba(255,255,255,.45); }
+.sc-top .wifi .bar { width: 5px; border-radius: 2px; background: rgba(255,255,255,.35); }
 .sc-top .wifi .bar:nth-child(1) { height: 5px; }
 .sc-top .wifi .bar:nth-child(2) { height: 8px; }
 .sc-top .wifi .bar:nth-child(3) { height: 11px; background: #f59e0b; }
-
-.sc-hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 11vw, 3.4rem);
-  line-height: .96;
-  letter-spacing: -.045em;
-  font-weight: 800;
-  text-wrap: balance;
-}
+.sc-hero h1 { font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: .96; letter-spacing: -.045em; font-weight: 800; text-wrap: balance; }
 .sc-hero h1 .accent {
   display: block;
   background: linear-gradient(100deg, #fbbf24, #f97316 55%, #e11d48);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.sc-hero .date {
-  margin-top: 16px;
-  display: flex; align-items: center; gap: 10px;
-  font-size: .82rem;
-  color: rgba(255, 255, 255, .62);
-  letter-spacing: .02em;
-}
-.sc-hero .date .sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255, 255, 255, .4); }
-.sc-hero .lede {
-  margin-top: 18px;
-  font-size: .94rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, .5);
-  max-width: 34ch;
-}
-
-/* Bande sponsor intégrée à la composition */
-.sc-sponsor {
-  margin-top: 30px;
-  padding: 14px 16px;
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, .045);
-  border: 1px solid rgba(255, 255, 255, .09);
-  display: flex; align-items: center; gap: 13px;
-}
+.sc-hero .date { margin-top: 16px; display: flex; align-items: center; gap: 10px; font-size: .82rem; color: rgba(255,255,255,.62); }
+.sc-hero .date .sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,.4); }
+.sc-hero .lede { margin-top: 18px; font-size: .94rem; line-height: 1.7; color: rgba(255,255,255,.5); max-width: 34ch; }
+.sc-sponsor { margin-top: 30px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.09); display: flex; align-items: center; gap: 13px; }
 .sc-sponsor .logo {
-  width: 40px; height: 40px; flex: none;
-  border-radius: 11px;
+  width: 40px; height: 40px; flex: none; border-radius: 11px;
   background: linear-gradient(140deg, #f59e0b, #e11d48);
-  display: grid; place-items: center;
-  font-weight: 800; font-size: 1rem; color: #fff;
-  box-shadow: 0 8px 20px -10px rgba(245, 158, 11, .9);
+  display: grid; place-items: center; font-weight: 800; font-size: 1rem; color: #fff;
+  box-shadow: 0 8px 20px -10px rgba(245,158,11,.9);
 }
-.sc-sponsor .txt { font-size: .78rem; color: rgba(255, 255, 255, .5); line-height: 1.4; }
-.sc-sponsor .txt b { display: block; color: #fafafa; font-size: .9rem; font-weight: 650; margin-bottom: 1px; }
-
-.sc-cta { margin-top: 26px; width: 100%; min-height: 58px; }
+.sc-sponsor .txt { font-size: .78rem; color: rgba(255,255,255,.5); line-height: 1.4; }
+.sc-sponsor .txt b { display: block; color: #fafafa; font-size: .9rem; font-weight: 650; }
+.sc-cta { margin-top: 26px; width: 100%; }
 .sc-connect {
-  width: 100%;
-  padding: 18px;
-  border: 0;
-  border-radius: var(--r-lg);
-  background: #fafafa;
-  color: #0c0a14;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -.01em;
+  width: 100%; padding: 18px; border: 0; border-radius: 20px;
+  background: #fafafa; color: #0c0a14; font-size: 1rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  box-shadow: 0 16px 40px -16px rgba(250, 250, 250, .5);
+  box-shadow: 0 16px 40px -16px rgba(250,250,250,.5);
 }
 .sc-connect:disabled { opacity: .65; }
 .sc-connect .arrow { transition: transform var(--dur-hover) var(--ease-out); }
-@media (hover: hover) and (pointer: fine) {
-  .sc-connect:hover .arrow { transform: translateX(3px); }
-}
-.sc-fine { margin-top: 14px; text-align: center; font-size: .74rem; color: rgba(255, 255, 255, .38); }
-
-/* État connecté — théâtral */
+@media (hover: hover) and (pointer: fine) { .sc-connect:hover .arrow { transform: translateX(3px); } }
+.sc-fine { margin-top: 14px; text-align: center; font-size: .74rem; color: rgba(255,255,255,.38); }
 .sc-on { display: none; text-align: center; padding-top: 10vh; }
 .sc-on.show { display: block; }
-.sc-on .curtain {
-  opacity: 1; transform: scale(1);
-  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
-}
+.sc-on .curtain { opacity: 1; transform: scale(1); transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out); }
 .sc-on .curtain { @starting-style { opacity: 0; transform: scale(.94); } }
-.sc-on .badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 7px 15px;
-  border-radius: 999px;
-  background: rgba(52, 211, 153, .1);
-  border: 1px solid rgba(52, 211, 153, .3);
-  color: #6ee7b7;
-  font-size: .76rem;
-  font-weight: 650;
-}
-.sc-on h2 {
-  margin-top: 22px;
-  font-size: clamp(1.8rem, 8vw, 2.4rem);
-  letter-spacing: -.04em;
-  font-weight: 800;
-  line-height: 1.05;
-}
-.sc-on .meta { margin-top: 14px; color: rgba(255, 255, 255, .5); font-size: .86rem; }
-.sc-on .pass {
-  margin: 26px auto 0;
-  max-width: 300px;
-  padding: 16px;
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, .05);
-  border: 1px dashed rgba(255, 255, 255, .16);
-}
-.sc-on .pass .k { font-size: .66rem; text-transform: uppercase; letter-spacing: .14em; color: rgba(255, 255, 255, .4); }
+.sc-on .badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 15px; border-radius: 999px; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.3); color: #6ee7b7; font-size: .76rem; font-weight: 650; }
+.sc-on h2 { margin-top: 22px; font-size: clamp(1.8rem, 8vw, 2.4rem); letter-spacing: -.04em; font-weight: 800; line-height: 1.05; }
+.sc-on .meta { margin-top: 14px; color: rgba(255,255,255,.5); font-size: .86rem; }
+.sc-on .pass { margin: 26px auto 0; max-width: 300px; padding: 16px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px dashed rgba(255,255,255,.16); }
+.sc-on .pass .k { font-size: .66rem; text-transform: uppercase; letter-spacing: .14em; color: rgba(255,255,255,.4); }
 .sc-on .pass .v { font-size: 1.5rem; font-weight: 750; letter-spacing: -.02em; margin-top: 4px; }
-.sc-on .pass .s { font-size: .76rem; color: rgba(255, 255, 255, .45); margin-top: 2px; }
+.sc-on .pass .s { font-size: .76rem; color: rgba(255,255,255,.45); margin-top: 2px; }
 
 /* ================================================================
-   VARIANTE 3 — ÉCHANGE
-   Axe : troc explicite et transparent. L'utilisateur choisit
-   son échange contre du temps.
-   Personnalité : vivante, jeu, ressorts subtils.
+   VARIANTE 3 — ÉCHANGE  (charte PremiumConnect, clarté absolue)
+   Axe : la JAUGE. Cause → effet visible. On ne lit pas un troc,
+   on VOIT le temps rentrer et la barre se remplir.
    ================================================================ */
 #v-echange {
-  --ac: #10b981;
-  background:
-    radial-gradient(90% 50% at 90% 0%, rgba(16, 185, 129, .12), transparent 60%),
-    #0a0d0c;
-  color: #fafafa;
-}
-#v-echange .inner { max-width: 430px; margin: 0 auto; padding: calc(24px + var(--safe-t)) 20px calc(96px + var(--safe-b)); }
+  --pc-violet: #5B4DFF;
+  --pc-coral:  #FF4D6A;
+  --pc-ink:    #191933;
+  --pc-bg:     #f5f5fb;
+  --pc-card:   #ffffff;
+  --pc-track:  #e9e9f4;
+  --pc-muted:  #6d6d88;
+  --pc-line:   #e6e6f0;
 
-.ec-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
-.ec-top .brand { display: flex; align-items: center; gap: 9px; font-size: .88rem; font-weight: 650; }
-.ec-top .brand .dot {
-  width: 30px; height: 30px; border-radius: 9px;
-  background: linear-gradient(140deg, #10b981, #047857);
-  display: grid; place-items: center;
+  --ac: #5B4DFF;
+  background: var(--pc-bg);
+  color: var(--pc-ink);
 }
-.ec-top .brand .dot svg { width: 16px; height: 16px; }
-.ec-wallet {
-  display: flex; align-items: center; gap: 7px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .06);
-  border: 1px solid rgba(255, 255, 255, .1);
-  font-size: .78rem; font-weight: 650;
+#v-echange .inner { max-width: 430px; margin: 0 auto; padding: calc(22px + var(--safe-t)) 18px calc(110px + var(--safe-b)); }
+
+.ec2-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.ec2-brand { display: flex; align-items: center; gap: 9px; font-weight: 800; letter-spacing: -.02em; }
+.ec2-brand .dot {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  display: grid; place-items: center; box-shadow: 0 6px 16px -6px rgba(91,77,255,.7);
 }
-.ec-wallet b { color: #6ee7b7; }
+.ec2-brand .dot svg { width: 17px; height: 17px; }
+.ec2-lang {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: 999px;
+  background: var(--pc-card); border: 1px solid var(--pc-line);
+  font-size: .72rem; font-weight: 700; color: var(--pc-muted);
+}
 
-.ec-hero h1 { font-size: clamp(1.55rem, 6.5vw, 1.95rem); letter-spacing: -.03em; line-height: 1.18; font-weight: 700; }
-.ec-hero h1 b { color: #6ee7b7; }
-.ec-hero .sub { margin-top: 10px; color: rgba(255, 255, 255, .52); font-size: .9rem; line-height: 1.6; }
+.ec2-hero { text-align: center; margin-bottom: 20px; }
+.ec2-hero h1 { font-size: clamp(1.6rem, 7vw, 2rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
+.ec2-hero h1 b {
+  background: linear-gradient(100deg, var(--pc-violet), var(--pc-coral));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ec2-hero p { margin-top: 8px; color: var(--pc-muted); font-size: .88rem; line-height: 1.5; }
 
-/* Les 3 offres d'échange */
-.ec-deals { margin-top: 26px; display: grid; gap: 10px; }
-.ec-deal {
+/* ============ LA JAUGE — l'élément central ============ */
+.ec2-gauge {
   position: relative;
-  display: flex; align-items: center; gap: 13px;
-  width: 100%;
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, .1);
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, .045);
-  text-align: left;
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--pc-card);
+  border: 1px solid var(--pc-line);
+  box-shadow: 0 10px 30px -18px rgba(25,25,51,.35), 0 2px 6px -4px rgba(25,25,51,.2);
+}
+.ec2-gauge.pulse { animation: gpulse 420ms var(--ease-out); }
+@keyframes gpulse { 40% { transform: scale(1.035); } }
+.ec2-gauge .row1 { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; }
+.ec2-gauge .lbl { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--pc-muted); }
+.ec2-gauge .num { font-size: 2.1rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.ec2-gauge .num small { font-size: .9rem; font-weight: 700; color: var(--pc-muted); margin-left: 3px; }
+.ec2-track {
+  position: relative;
+  height: 16px; border-radius: 999px;
+  background: var(--pc-track);
   overflow: hidden;
-  transition: background-color var(--dur-hover) var(--ease-out),
+}
+.ec2-fill {
+  position: absolute; inset: 0 auto 0 0; width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--pc-violet), var(--pc-coral));
+  transition: width 700ms var(--ease-out);
+}
+.ec2-mark { position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; background: var(--pc-ink); opacity: .35; }
+.ec2-gauge .row2 { display: flex; justify-content: space-between; margin-top: 9px; font-size: .7rem; font-weight: 600; color: var(--pc-muted); }
+.ec2-gauge .row2 .goal b { color: var(--pc-ink); }
+.ec2-state { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 650; color: var(--pc-muted); }
+.ec2-state .lamp { width: 8px; height: 8px; border-radius: 50%; background: #c5c5d8; box-shadow: 0 0 0 3px rgba(197,197,216,.25); }
+.ec2-state.ready { color: #0d9b5c; }
+.ec2-state.ready .lamp { background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.2); }
+
+/* ============ Les missions ============ */
+.ec2-sec { margin-top: 22px; margin-bottom: 11px; display: flex; align-items: center; gap: 9px; }
+.ec2-sec span { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; color: var(--pc-muted); }
+.ec2-sec i { flex: 1; height: 1px; background: var(--pc-line); }
+
+.ec2-missions { display: grid; gap: 10px; }
+.ec2-mission {
+  position: relative;
+  display: flex; align-items: center; gap: 13px; width: 100%; text-align: left;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--pc-card);
+  border: 1px solid var(--pc-line);
+  box-shadow: 0 4px 14px -10px rgba(25,25,51,.4);
+  overflow: hidden;
+  transition: transform var(--dur-hover) var(--ease-out),
+              box-shadow var(--dur-hover) var(--ease-out),
               border-color var(--dur-hover) var(--ease-out),
-              transform var(--dur-hover) var(--ease-out);
-}
-.ec-deal::after {
-  content: "";
-  position: absolute; right: 16px; top: 50%;
-  width: 7px; height: 7px;
-  border-right: 2px solid rgba(255, 255, 255, .3);
-  border-bottom: 2px solid rgba(255, 255, 255, .3);
-  transform: translateY(-70%) rotate(-45deg);
-}
-.ec-deal .ic {
-  width: 40px; height: 40px; flex: none;
-  border-radius: 11px;
-  display: grid; place-items: center;
-}
-.ec-deal .ic svg { width: 19px; height: 19px; }
-.ec-deal[data-kind="quiz"] .ic { background: rgba(139, 92, 246, .15); }
-.ec-deal[data-kind="quiz"] .ic svg { stroke: #c4b5fd; }
-.ec-deal[data-kind="sponsor"] .ic { background: rgba(245, 158, 11, .15); }
-.ec-deal[data-kind="sponsor"] .ic svg { stroke: #fcd34d; }
-.ec-deal[data-kind="ref"] .ic { background: rgba(16, 185, 129, .15); }
-.ec-deal[data-kind="ref"] .ic svg { stroke: #6ee7b7; }
-.ec-deal .t { font-size: .92rem; font-weight: 650; }
-.ec-deal .d { font-size: .78rem; color: rgba(255, 255, 255, .48); margin-top: 2px; line-height: 1.45; }
-.ec-deal .gain {
-  position: absolute; right: 34px; bottom: 12px;
-  font-size: .72rem; font-weight: 700; color: #6ee7b7;
+              opacity var(--dur-hover) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .ec-deal:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, .2); background: rgba(255, 255, 255, .075); }
+  .ec2-mission:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -14px rgba(91,77,255,.45); border-color: #d9d4ff; }
 }
+.ec2-mission:active { transform: scale(.98); }
+.ec2-mission.done { opacity: .5; }
+.ec2-mission .ic { width: 42px; height: 42px; flex: none; border-radius: 13px; display: grid; place-items: center; }
+.ec2-mission .ic svg { width: 20px; height: 20px; }
+.ec2-mission[data-kind="quiz"] .ic { background: rgba(91,77,255,.12); }
+.ec2-mission[data-kind="quiz"] .ic svg { stroke: var(--pc-violet); }
+.ec2-mission[data-kind="sponsor"] .ic { background: rgba(255,77,106,.12); }
+.ec2-mission[data-kind="sponsor"] .ic svg { stroke: var(--pc-coral); }
+.ec2-mission[data-kind="ref"] .ic { background: rgba(16,185,129,.12); }
+.ec2-mission[data-kind="ref"] .ic svg { stroke: #0d9b5c; }
+.ec2-mission .t { font-size: .94rem; font-weight: 700; }
+.ec2-mission .d { font-size: .76rem; color: var(--pc-muted); margin-top: 2px; line-height: 1.4; }
+.ec2-mission .gain {
+  margin-left: auto; flex: none;
+  padding: 6px 11px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff; font-size: .76rem; font-weight: 800;
+  box-shadow: 0 5px 12px -6px rgba(91,77,255,.8);
+}
+.ec2-mission.done .gain { visibility: hidden; }
+.ec2-mission .check {
+  position: absolute; top: 10px; right: 10px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #10b981; color: #fff; display: none; place-items: center;
+}
+.ec2-mission.done .check { display: grid; }
 
-/* Zone d'échange (apparaît après choix) */
-.ec-task { display: none; margin-top: 22px; }
-.ec-task.show { display: block; }
-.ec-task .hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.ec-task .hd .k { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: rgba(255, 255, 255, .4); }
-.ec-task .hd .x {
-  border: 0; background: transparent; color: rgba(255, 255, 255, .4);
-  font-size: .8rem; padding: 4px 6px; border-radius: 8px;
+/* ============ Zone de tâche ============ */
+.ec2-task { display: none; margin-top: 14px; }
+.ec2-task.show { display: block; }
+.ec2-task .hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.ec2-task .hd .k { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--pc-muted); }
+.ec2-task .hd .x {
+  border: 0; background: transparent; color: var(--pc-muted);
+  font-size: .8rem; padding: 5px 8px; border-radius: 9px;
   transition: color var(--dur-hover) var(--ease-out), background-color var(--dur-hover) var(--ease-out);
 }
-.ec-task .hd .x:active { transform: scale(.94); }
+.ec2-task .hd .x:active { transform: scale(.94); }
 @media (hover: hover) and (pointer: fine) {
-  .ec-task .hd .x:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+  .ec2-task .hd .x:hover { color: var(--pc-ink); background: var(--pc-track); }
 }
-.ec-card {
-  padding: 18px;
-  border-radius: var(--r-lg);
-  background: rgba(255, 255, 255, .055);
-  border: 1px solid rgba(255, 255, 255, .1);
+.ec2-card {
+  padding: 18px; border-radius: 20px;
+  background: var(--pc-card); border: 1px solid var(--pc-line);
+  box-shadow: 0 10px 30px -18px rgba(25,25,51,.35);
 }
-.ec-q { font-size: 1rem; font-weight: 650; line-height: 1.4; }
-.ec-opts { margin-top: 16px; display: grid; gap: 8px; }
-.ec-opt {
+.ec2-q { font-size: 1.02rem; font-weight: 700; line-height: 1.35; }
+.ec2-opts { margin-top: 16px; display: grid; gap: 8px; }
+.ec2-opt {
   width: 100%; text-align: left;
-  padding: 13px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, .1);
-  background: rgba(255, 255, 255, .04);
-  font-size: .88rem;
-  display: flex; align-items: center; gap: 10px;
+  padding: 13px 14px; border-radius: 13px;
+  border: 1px solid var(--pc-line); background: #fafaff;
+  font-size: .9rem; font-weight: 600;
+  display: flex; align-items: center; gap: 11px;
   transition: background-color var(--dur-hover) var(--ease-out),
               border-color var(--dur-hover) var(--ease-out),
               transform var(--dur-hover) var(--ease-out);
 }
-.ec-opt .key {
-  width: 22px; height: 22px; flex: none;
-  border-radius: 7px;
-  background: rgba(255, 255, 255, .08);
-  display: grid; place-items: center;
-  font-size: .7rem; font-weight: 700; color: rgba(255, 255, 255, .55);
+.ec2-opt .key {
+  width: 24px; height: 24px; flex: none; border-radius: 8px;
+  background: var(--pc-track); display: grid; place-items: center;
+  font-size: .7rem; font-weight: 800; color: var(--pc-muted);
 }
-.ec-opt.ok  { border-color: rgba(52, 211, 153, .5); background: rgba(52, 211, 153, .12); }
-.ec-opt.ok  .key { background: rgba(52, 211, 153, .25); color: #6ee7b7; }
-.ec-opt.no  { border-color: rgba(251, 113, 133, .45); background: rgba(251, 113, 133, .1); }
-.ec-opt.no  .key { background: rgba(251, 113, 133, .22); color: #fda4af; }
-.ec-opt:disabled { cursor: default; }
-.ec-opt:active:not(:disabled) { transform: scale(.98); }
+.ec2-opt.ok  { border-color: rgba(16,185,129,.55); background: rgba(16,185,129,.1); }
+.ec2-opt.ok  .key { background: rgba(16,185,129,.22); color: #0d9b5c; }
+.ec2-opt.no  { border-color: rgba(255,77,106,.5); background: rgba(255,77,106,.09); }
+.ec2-opt.no  .key { background: rgba(255,77,106,.2); color: #e53e6b; }
+.ec2-opt:disabled { cursor: default; }
+.ec2-opt:active:not(:disabled) { transform: scale(.98); }
 
-/* Sponsor : anneau de 5s */
-.ec-ring-wrap { display: grid; place-items: center; padding: 12px 0 4px; }
-.ec-ring {
-  position: relative;
-  width: 118px; height: 118px;
-  border-radius: 50%;
+/* Anneau sponsor */
+.ec2-ring-wrap { display: grid; place-items: center; padding: 8px 0 2px; }
+.ec2-ring {
+  position: relative; width: 124px; height: 124px; border-radius: 50%;
   display: grid; place-items: center;
-  background: conic-gradient(var(--ac) var(--angle), rgba(255, 255, 255, .1) 0deg);
+  background: conic-gradient(var(--pc-violet) var(--angle), var(--pc-track) 0deg);
   transition: --angle 5000ms linear;
 }
-.ec-ring::before {
-  content: "";
-  position: absolute; inset: 7px;
-  border-radius: 50%;
-  background: #0a0d0c;
-}
-.ec-ring .n { position: relative; font-size: 2rem; font-weight: 750; }
-.ec-ring .n small { display: block; font-size: .6rem; font-weight: 600; color: rgba(255, 255, 255, .45); letter-spacing: .08em; }
-.ec-ring.go { --angle: 360deg; }
+.ec2-ring::before { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: var(--pc-card); }
+.ec2-ring .n { position: relative; font-size: 2.1rem; font-weight: 800; }
+.ec2-ring .n small { display: block; font-size: .58rem; font-weight: 700; color: var(--pc-muted); letter-spacing: .08em; text-align: center; }
+.ec2-ring.go { --angle: 360deg; }
+.ec2-ring-hint { margin-top: 14px; font-size: .8rem; color: var(--pc-muted); line-height: 1.5; text-align: center; }
+.ec2-ring-hint b { color: var(--pc-coral); }
 
 /* Parrainage */
-.ec-ref-code {
-  margin-top: 4px;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px dashed rgba(255, 255, 255, .2);
-  background: rgba(255, 255, 255, .03);
+.ec2-ref-code {
+  margin-top: 4px; padding: 15px; border-radius: 14px;
+  border: 1px dashed #cfc9f5; background: #fafaff;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
-.ec-ref-code .c { font-size: 1.15rem; font-weight: 750; letter-spacing: .06em; }
-.ec-copy {
-  flex: none;
-  padding: 9px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, .14);
-  background: rgba(255, 255, 255, .06);
-  font-size: .8rem; font-weight: 650;
-  transition: background-color var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out);
+.ec2-ref-code .c { font-size: 1.18rem; font-weight: 800; letter-spacing: .05em; }
+.ec2-copy {
+  flex: none; padding: 9px 15px; border-radius: 11px; border: 0;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff; font-size: .8rem; font-weight: 700;
+  box-shadow: 0 5px 12px -6px rgba(91,77,255,.8);
 }
-.ec-copy.done { color: #6ee7b7; border-color: rgba(52, 211, 153, .4); background: rgba(52, 211, 153, .12); }
-.ec-copy:active { transform: scale(.96); }
-.ec-hint { margin-top: 12px; font-size: .78rem; color: rgba(255, 255, 255, .45); line-height: 1.5; }
+.ec2-copy.done { background: #10b981; }
+.ec2-copy:active { transform: scale(.96); }
+.ec2-hint { margin-top: 12px; font-size: .8rem; color: var(--pc-muted); line-height: 1.5; }
 
-/* Récompense + connexion */
-.ec-reward { display: none; margin-top: 20px; text-align: center; }
-.ec-reward.show { display: block; }
-.ec-reward .got {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: rgba(52, 211, 153, .12);
-  border: 1px solid rgba(52, 211, 153, .32);
-  color: #6ee7b7;
-  font-size: .84rem; font-weight: 700;
-}
-.ec-connect {
-  margin-top: 22px;
-  width: 100%;
-  padding: 17px;
-  border: 0;
-  border-radius: var(--r-lg);
-  background: linear-gradient(135deg, #10b981, #047857);
-  color: #fff;
+/* ============ CTA connexion fixe ============ */
+.ec2-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; padding: 12px 18px calc(12px + var(--safe-b)); background: linear-gradient(to top, var(--pc-bg) 62%, rgba(245,245,251,0)); }
+.ec2-connect {
+  width: 100%; min-height: 58px; border: 0; border-radius: 18px;
+  background: var(--pc-track); color: var(--pc-muted);
   font-size: 1rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: 56px;
-  box-shadow: 0 12px 30px -12px rgba(16, 185, 129, .9), inset 0 1px 0 rgba(255, 255, 255, .2);
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  transition: background var(--dur-hover) var(--ease-out), color var(--dur-hover) var(--ease-out), transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out);
 }
-.ec-connect:disabled { opacity: .7; }
+.ec2-connect.live {
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff;
+  box-shadow: 0 14px 30px -12px rgba(91,77,255,.85), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.ec2-connect.live:active { transform: scale(.97); }
+.ec2-connect.pop { animation: cpop 380ms var(--ease-pop); }
+@keyframes cpop { 0% { transform: scale(.94); } 55% { transform: scale(1.025); } 100% { transform: scale(1); } }
 
-/* État connecté commun aux 3 */
-.done-screen { display: none; text-align: center; padding-top: 6vh; }
-.done-screen.show { display: block; }
-.done-screen .ring {
-  width: 82px; height: 82px;
-  margin: 0 auto 22px;
-  border-radius: 50%;
+/* ============ Badge volant ("+20 min" → jauge) ============ */
+.fly {
+  position: fixed; z-index: 200; pointer-events: none;
+  padding: 7px 13px; border-radius: 999px; white-space: nowrap;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff; font-size: .82rem; font-weight: 800;
+  box-shadow: 0 10px 22px -8px rgba(91,77,255,.9);
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 680ms var(--ease-pop), opacity 680ms var(--ease-out);
+}
+
+/* ============ Écran connecté ============ */
+.ec2-on { display: none; text-align: center; padding-top: 7vh; }
+.ec2-on.show { display: block; }
+.ec2-on .ring {
+  width: 84px; height: 84px; margin: 0 auto 22px; border-radius: 50%;
   display: grid; place-items: center;
+  background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.4);
 }
-.done-screen .ring svg { width: 38px; height: 38px; }
-.done-screen h2 { font-size: clamp(1.5rem, 6.5vw, 1.9rem); letter-spacing: -.03em; font-weight: 750; }
-.done-screen .meta { margin-top: 10px; color: rgba(255, 255, 255, .55); font-size: .88rem; }
-.done-screen .row {
-  margin-top: 26px;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  text-align: left;
-}
-.done-screen .stat {
-  padding: 13px;
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, .05);
-  border: 1px solid rgba(255, 255, 255, .09);
-}
-.done-screen .stat .k { font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255, 255, 255, .4); }
-.done-screen .stat .v { font-size: 1.05rem; font-weight: 700; margin-top: 3px; }
-
-#v-echange .done-screen .ring { background: rgba(16, 185, 129, .12); border: 1px solid rgba(16, 185, 129, .35); }
-#v-echange .done-screen .ring svg { stroke: #34d399; }
-
-.reset {
-  margin-top: 26px;
-  border: 1px solid rgba(255, 255, 255, .12);
-  background: rgba(255, 255, 255, .04);
-  color: rgba(255, 255, 255, .6);
-  padding: 11px 18px;
-  border-radius: 12px;
-  font-size: .84rem; font-weight: 600;
+.ec2-on .ring svg { width: 38px; height: 38px; stroke: #0d9b5c; }
+.ec2-on h2 { font-size: clamp(1.5rem, 6.5vw, 1.9rem); letter-spacing: -.03em; font-weight: 800; }
+.ec2-on .meta { margin-top: 10px; color: var(--pc-muted); font-size: .9rem; }
+.ec2-on .row { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; }
+.ec2-on .stat { padding: 13px; border-radius: 16px; background: var(--pc-card); border: 1px solid var(--pc-line); }
+.ec2-on .stat .k { font-size: .64rem; text-transform: uppercase; letter-spacing: .1em; color: var(--pc-muted); font-weight: 700; }
+.ec2-on .stat .v { font-size: 1.05rem; font-weight: 800; margin-top: 3px; }
+.ec2-reset {
+  margin-top: 24px; border: 1px solid var(--pc-line); background: var(--pc-card);
+  color: var(--pc-muted); padding: 11px 18px; border-radius: 13px;
+  font-size: .84rem; font-weight: 700;
   transition: color var(--dur-hover) var(--ease-out), background-color var(--dur-hover) var(--ease-out);
 }
-.reset:active { transform: scale(.97); }
+.ec2-reset:active { transform: scale(.97); }
 
-/* ---------- Barre de statut simulée (réalisme) ---------- */
-.fakebar {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-bottom: 22px;
-  font-size: .72rem;
-  color: rgba(255, 255, 255, .4);
+/* ---------- Spinner + reduced motion ---------- */
+.spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.25); border-top-color: #fff;
+  animation: spin .8s linear infinite;
 }
-.fakebar .live { width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 3px rgba(52, 211, 153, .15); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ec2-connect:not(.live) .spinner { border-color: rgba(25,25,51,.2); border-top-color: var(--pc-muted); }
 
-/* ---------- Accessibilité ---------- */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-  .variant.active .rise,
-  .sc-on .curtain,
-  .ins-on, .ec-task, .ec-reward, .done-screen { transform: none !important; }
-  .ec-ring { transition: none !important; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  .variant.active .rise, .sc-on .curtain, .ins-on, .ec2-task, .ec2-on { transform: none !important; }
+  .ec2-ring, .fly { transition: none !important; }
+  .fly { opacity: 0 !important; }
 }
 </style>
 </head>
@@ -688,7 +492,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   <button data-v="scene" aria-selected="false" style="--pick-accent:#f59e0b">
     <span class="num">02</span><span class="nm">Scène</span>
   </button>
-  <button data-v="echange" aria-selected="false" style="--pick-accent:#10b981">
+  <button data-v="echange" aria-selected="false" style="--pick-accent:#5B4DFF">
     <span class="num">03</span><span class="nm">Échange</span>
   </button>
 </nav>
@@ -700,60 +504,37 @@ button { font: inherit; color: inherit; cursor: pointer; }
      ================================================================ -->
 <section id="v-instant" class="variant active">
   <div class="ins-wrap">
-
-    <!-- Écran portail -->
     <div class="ins-portal rise" id="insPortal">
       <div class="ins-mark">
-        <span class="dot">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
-            <path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.4" fill="#fff" stroke="none"/>
-          </svg>
-        </span>
-        <span>
-          <span class="ssid">Salon Pro WiFi</span><br>
-          <span class="sec">Réseau sécurisé · Hall principal</span>
-        </span>
+        <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.4" fill="#fff" stroke="none"/></svg></span>
+        <span><span class="ssid">Salon Pro WiFi</span><br><span class="sec">Réseau sécurisé · Hall principal</span></span>
       </div>
-
       <div class="ins-hero">
         <h1>Internet en<br><em>un geste.</em></h1>
         <p class="ins-sub">Aucun formulaire, aucune attente. Touche, tu es connecté. Les bonus arrivent après — jamais avant.</p>
       </div>
-
-      <button class="ins-connect btn-press" id="insGo">
-        <span id="insGoLabel">Se connecter</span>
-      </button>
+      <button class="ins-connect btn-press" id="insGo"><span id="insGoLabel">Se connecter</span></button>
       <div class="ins-trust">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
         <span>Connexion chiffrée · 60 min offertes</span>
       </div>
     </div>
-
-    <!-- État connecté -->
     <div class="ins-on" id="insOn">
-      <div class="ring rise">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 6L9 17l-5-5"/>
-        </svg>
-      </div>
+      <div class="ring rise"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
       <h2 class="rise">Tu es connecté</h2>
       <p class="time rise">Il te reste <b class="mono" id="insClock">60:00</b> de connexion</p>
-
       <div class="ins-offers rise" id="insOffers">
         <p class="lbl">Étends ton temps — quand tu veux</p>
-
         <button class="card btn-press" data-offer="ref">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 12h13M12 5l7 7-7 7"/></svg></span>
           <span><span class="t">Inviter un collègue</span><span class="d">Partage le WiFi, +15 min pour toi</span></span>
           <span class="plus">+15 min</span>
         </button>
-
         <button class="card btn-press" data-offer="sponsor">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-2.8L7 19l1-6-4-4 5.5-.5z"/></svg></span>
           <span><span class="t">Découvrir le sponsor</span><span class="d">2 min sur l'exposant A12, +20 min</span></span>
           <span class="plus">+20 min</span>
         </button>
-
         <button class="card btn-press" data-offer="quiz">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></span>
           <span><span class="t">Répondre au quiz</span><span class="d">1 question sur le salon, +10 min</span></span>
@@ -761,7 +542,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
         </button>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -772,29 +552,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
   <div class="atmos"></div>
   <div class="grain"></div>
   <div class="inner">
-
-    <!-- Écran portail -->
     <div class="sc-portal rise" id="scPortal">
       <div class="sc-top">
         <span class="kicker">WiFi officiel</span>
         <span class="wifi"><span class="bar"></span><span class="bar"></span><span class="bar"></span> Signal excellent</span>
       </div>
-
       <div class="sc-hero">
         <h1>Festival<span class="accent">Teranga</span>2026</h1>
-        <p class="date">
-          <span>19 — 21 Sept.</span><span class="sep"></span>
-          <span>CICAD, Dakar</span><span class="sep"></span>
-          <span>3 jours</span>
-        </p>
+        <p class="date"><span>19 — 21 Sept.</span><span class="sep"></span><span>CICAD, Dakar</span><span class="sep"></span><span>3 jours</span></p>
         <p class="lede">Le portail officiel du festival. Offert par notre partenaire officiel, sur tout le site.</p>
       </div>
-
       <div class="sc-sponsor">
         <span class="logo">W</span>
         <span class="txt"><b>WariTel — Partenaire officiel</b>Internet gratuit pour les 3 jours du festival</span>
       </div>
-
       <div class="sc-cta">
         <button class="sc-connect btn-press" id="scGo">
           <span id="scGoLabel">Rejoindre le festival</span>
@@ -803,14 +574,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
         <p class="sc-fine">1h offerte · navigation illimitée · renouvelable</p>
       </div>
     </div>
-
-    <!-- État connecté -->
     <div class="sc-on" id="scOn">
       <div class="curtain">
-        <span class="badge">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-          Connecté au réseau du festival
-        </span>
+        <span class="badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>Connecté au réseau du festival</span>
         <h2>Bienvenue à<br>Teranga 2026</h2>
         <p class="meta">Internet actif sur tout le site · <b class="mono" id="scClock">60:00</b> restantes</p>
         <div class="pass">
@@ -821,87 +587,105 @@ button { font: inherit; color: inherit; cursor: pointer; }
         <button class="reset btn-press" data-reset="scene">↺ Refaire le portail</button>
       </div>
     </div>
-
   </div>
 </section>
 
 <!-- ================================================================
-     VARIANTE 3 — ÉCHANGE
+     VARIANTE 3 — ÉCHANGE (PremiumConnect)
+     La jauge est le héros : cause → effet visible.
      ================================================================ -->
 <section id="v-echange" class="variant">
   <div class="inner">
 
-    <!-- Écran portail -->
-    <div class="ec-portal rise" id="ecPortal">
-      <div class="ec-top">
-        <span class="brand">
+    <div class="ec2-portal rise" id="ecPortal">
+      <div class="ec2-top">
+        <span class="ec2-brand">
           <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.4" fill="#fff" stroke="none"/></svg></span>
-          Teranga Arena
+          PremiumConnect
         </span>
-        <span class="ec-wallet">Temps <b class="mono" id="ecWallet">0 min</b></span>
+        <span class="ec2-lang">FR</span>
       </div>
 
-      <div class="ec-hero">
-        <h1>Du temps contre<br><b>15 secondes</b> d'attention.</h1>
-        <p class="sub">Tout est transparent : tu choisis l'échange, tu vois le gain avant de dire oui. Aucune obligation, aucune surprise.</p>
+      <div class="ec2-hero">
+        <h1>Internet gratuit,<br><b>gagné en 1 mission.</b></h1>
+        <p>Choisis une mission ci-dessous. Le temps gagné s'ajoute tout de suite à ta jauge.</p>
       </div>
 
-      <div class="ec-deals" id="ecDeals">
-        <button class="ec-deal btn-press" data-kind="quiz">
+      <!-- LA JAUGE -->
+      <div class="ec2-gauge" id="ecGauge">
+        <div class="row1">
+          <span class="lbl">Ton temps WiFi</span>
+          <span class="num mono"><span id="ecNum">0</span><small>min</small></span>
+        </div>
+        <div class="ec2-track">
+          <div class="ec2-fill" id="ecFill"></div>
+          <div class="ec2-mark" id="ecMark" style="left:33%"></div>
+        </div>
+        <div class="row2">
+          <span>0 min</span>
+          <span class="goal">Objectif <b>30 min</b></span>
+        </div>
+        <div class="ec2-state" id="ecState">
+          <span class="lamp"></span>
+          <span id="ecStateTxt">Fais 1 mission pour débloquer internet</span>
+        </div>
+      </div>
+
+      <!-- MISSIONS -->
+      <div class="ec2-sec"><span>Choisis ta mission</span><i></i></div>
+
+      <div class="ec2-missions" id="ecMissions">
+        <button class="ec2-mission btn-press" data-kind="quiz">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></span>
-          <span><span class="t">Répondre à 1 question</span><span class="d">Quiz sur le salon — 15 secondes</span></span>
+          <span><span class="t">1 question</span><span class="d">15 secondes</span></span>
+          <span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
           <span class="gain">+10 min</span>
         </button>
 
-        <button class="ec-deal btn-press" data-kind="sponsor">
+        <button class="ec2-mission btn-press" data-kind="sponsor">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-2.8L7 19l1-6-4-4 5.5-.5z"/></svg></span>
-          <span><span class="t">Découvrir le sponsor</span><span class="d">WariTel, exposant A12 — 5 secondes</span></span>
+          <span><span class="t">Voir le sponsor</span><span class="d">5 secondes</span></span>
+          <span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
           <span class="gain">+20 min</span>
         </button>
 
-        <button class="ec-deal btn-press" data-kind="ref">
+        <button class="ec2-mission btn-press" data-kind="ref">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M10 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-4"/><path d="M13 4h6v6"/><path d="M19 4l-8 8"/></svg></span>
-          <span><span class="t">Parrainer un voisin</span><span class="d">Partage ton code, il gagne 10 min aussi</span></span>
+          <span><span class="t">Inviter un proche</span><span class="d">Partage ton code</span></span>
+          <span class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
           <span class="gain">+15 min</span>
         </button>
       </div>
 
-      <!-- Zone d'échange -->
-      <div class="ec-task" id="ecTask">
+      <!-- ZONE DE TÂCHE -->
+      <div class="ec2-task" id="ecTask">
         <div class="hd">
-          <span class="k" id="ecTaskKicker">Échange en cours</span>
+          <span class="k" id="ecTaskKicker">Mission</span>
           <button class="x btn-press" id="ecClose">Annuler ✕</button>
         </div>
-        <div class="ec-card" id="ecCardBody"></div>
+        <div class="ec2-card" id="ecCardBody"></div>
       </div>
-
-      <!-- Récompense -->
-      <div class="ec-reward" id="ecReward">
-        <span class="got rise">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-          <span><b id="ecGainNum">+10</b> min gagnées</span>
-        </span>
-      </div>
-
-      <button class="ec-connect btn-press" id="ecGo" hidden>
-        <span id="ecGoLabel">Se connecter</span>
-      </button>
     </div>
 
-    <!-- État connecté -->
-    <div class="done-screen" id="ecOn">
-      <div class="ring rise">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-      </div>
-      <h2 class="rise">Connecté</h2>
-      <p class="meta rise">Échange honoré · <b class="mono" id="ecClock">30:00</b> restantes</p>
+    <!-- ÉCRAN CONNECTÉ -->
+    <div class="ec2-on" id="ecOn">
+      <div class="ring rise"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h2 class="rise">Tu es connecté</h2>
+      <p class="meta rise"><b class="mono" id="ecClock">30:00</b> de navigation offertes</p>
       <div class="row rise">
-        <div class="stat"><p class="k">Temps acheté</p><p class="v mono">15 s</p></div>
+        <div class="stat"><p class="k">Mission faite</p><p class="v" id="ecStatKind">Quiz</p></div>
         <div class="stat"><p class="k">Temps gagné</p><p class="v mono" id="ecStatGain">+10 min</p></div>
       </div>
-      <button class="reset btn-press" data-reset="echange">↺ Refaire l'échange</button>
+      <button class="ec2-reset btn-press" data-reset="echange">↺ Recommencer</button>
     </div>
 
+  </div>
+
+  <!-- CTA connexion fixe -->
+  <div class="ec2-cta" id="ecCtaWrap" hidden>
+    <button class="ec2-connect" id="ecGo">
+      <span id="ecGoLabel">Fais une mission pour te connecter</span>
+    </button>
   </div>
 </section>
 
@@ -919,45 +703,44 @@ function switchVariant(name) {
   variants.forEach(v => v.classList.toggle("active", v.id === "v-" + name));
   pickerBtns.forEach(b => b.setAttribute("aria-selected", String(b.dataset.v === name)));
   resetAll();
-  // L'accent du picker suit la variante
   const ac = getComputedStyle(document.getElementById("v-" + name)).getPropertyValue("--ac").trim();
   pick.style.setProperty("--pick-accent", ac || "#8b5cf6");
+  const cta = document.getElementById("ecCtaWrap");
+  if (cta) cta.hidden = (name !== "echange");
   window.scrollTo({ top: 0, behavior: "auto" });
 }
 pickerBtns.forEach(b => b.addEventListener("click", () => switchVariant(b.dataset.v)));
 
-/* ==================== Minuteur partagé ==================== */
+/* ==================== Minuteurs ==================== */
 let timers = [];
-function clearTimers() { timers.forEach(t => clearInterval(t)); timers = []; }
+function clearTimers() { timers.forEach(t => { clearInterval(t); clearTimeout(t); }); timers = []; }
 function runClock(el, secondsLeft) {
   if (!el) return;
-  const tick = () => {
+  const handle = setInterval(() => {
     if (secondsLeft <= 0) { el.textContent = "00:00"; clearInterval(handle); return; }
     secondsLeft--;
     const m = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
     const s = String(secondsLeft % 60).padStart(2, "0");
     el.textContent = m + ":" + s;
-  };
-  const handle = setInterval(tick, 1000);
+  }, 1000);
   timers.push(handle);
 }
 
-/* ==================== Bouton "connexion" simulé ==================== */
+/* ==================== Connexion simulée ==================== */
 function fakeConnect(btn, label, doneLabel, cb) {
   const original = label.textContent;
   btn.disabled = true;
   label.textContent = doneLabel;
   const sp = document.createElement("span");
   sp.className = "spinner";
-  sp.style.borderColor = "rgba(255,255,255,.25)";
-  sp.style.borderTopColor = "#fff";
   btn.appendChild(sp);
-  timers.push(setTimeout(() => {
+  const h = setTimeout(() => {
     sp.remove();
     label.textContent = original;
     btn.disabled = false;
     if (cb) cb();
-  }, 1100));
+  }, 1100);
+  timers.push(h);
 }
 
 /* ==================== V1 — INSTANT ==================== */
@@ -977,30 +760,12 @@ insGo.addEventListener("click", () => {
 document.querySelectorAll("#insOffers .card").forEach(c => {
   c.addEventListener("click", () => {
     const plus = c.querySelector(".plus");
-    const gain = parseInt(plus.textContent, 10);
     plus.textContent = "✓ Fait";
     plus.style.color = "#c4b5fd";
     c.disabled = true;
     c.style.opacity = ".55";
-    // on ajoute le temps à l'horloge
-    const clk = document.getElementById("insClock");
-    const [m, s] = clk.textContent.split(":").map(Number);
-    runClockAdd(clk, m * 60 + s + gain * 60);
   });
 });
-function runClockAdd(el, secondsLeft) {
-  // remplace le minuteur en cours par un nouveau avec la réserve mise à jour
-  clearTimersKeepClock();
-  runClock(el, secondsLeft);
-}
-function clearTimersKeepClock() {
-  //garde seulement le dernier minuteur
-  if (timers.length > 1) {
-    const last = timers.pop();
-    timers.slice(0).forEach(t => clearInterval(t));
-    timers = [last];
-  }
-}
 
 /* ==================== V2 — SCÈNE ==================== */
 const scGo = document.getElementById("scGo");
@@ -1016,99 +781,164 @@ scGo.addEventListener("click", () => {
   });
 });
 
-/* ==================== V3 — ÉCHANGE ==================== */
-const GAIN = { quiz: 10, sponsor: 20, ref: 15 };
-const ecDeals = document.getElementById("ecDeals");
-const ecTask = document.getElementById("ecTask");
+/* ==================== V3 — ÉCHANGE (PremiumConnect) ==================== */
+const GAIN   = { quiz: 10, sponsor: 20, ref: 15 };
+const KIND   = { quiz: "Quiz", sponsor: "Sponsor", ref: "Parrainage" };
+const GOAL   = 30;   /* graduation de la jauge (max affiché) */
+const UNLOCK = 10;   /* 1 mission suffit à débloquer internet */
+
+const ecPortal   = document.getElementById("ecPortal");
+const ecOn       = document.getElementById("ecOn");
+const ecGauge    = document.getElementById("ecGauge");
+const ecNum      = document.getElementById("ecNum");
+const ecFill     = document.getElementById("ecFill");
+const ecState    = document.getElementById("ecState");
+const ecStateTxt = document.getElementById("ecStateTxt");
+const ecMissions = document.getElementById("ecMissions");
+const ecTask     = document.getElementById("ecTask");
 const ecCardBody = document.getElementById("ecCardBody");
-const ecReward = document.getElementById("ecReward");
-const ecGo = document.getElementById("ecGo");
-const ecGoLabel = document.getElementById("ecGoLabel");
-const ecPortal = document.getElementById("ecPortal");
-const ecOn = document.getElementById("ecOn");
-const ecWallet = document.getElementById("ecWallet");
-const ecKicker = document.getElementById("ecTaskKicker");
+const ecKicker   = document.getElementById("ecTaskKicker");
+const ecGo       = document.getElementById("ecGo");
+const ecGoLabel  = document.getElementById("ecGoLabel");
+const ecCtaWrap  = document.getElementById("ecCtaWrap");
 
 let earned = 0;
-let chosen = null;
+let doneKinds = new Set();
 
-function setWallet() { ecWallet.textContent = earned + " min"; }
+/* ---- Comptage animé du nombre (easeOutCubic) ---- */
+function countUp(el, from, to, dur) {
+  const t0 = performance.now();
+  function step(t) {
+    const p = Math.min(1, (t - t0) / dur);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * e);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
-ecDeals.querySelectorAll(".ec-deal").forEach(d => {
-  d.addEventListener("click", () => {
-    chosen = d.dataset.kind;
-    ecDeals.style.display = "none";
-    ecReward.classList.remove("show");
-    ecGo.hidden = true;
-    ecKicker.textContent = chosen === "quiz" ? "Quiz — 1 question"
-                        : chosen === "sponsor" ? "Découverte sponsor"
-                        : "Parrainage";
-    renderTask(chosen);
+/* ---- Badge "+X min" qui vole de la mission vers la jauge ---- */
+function flyBadge(fromEl, toEl, text) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const a = fromEl.getBoundingClientRect();
+  const b = toEl.getBoundingClientRect();
+  const el = document.createElement("span");
+  el.className = "fly";
+  el.textContent = text;
+  el.style.left = (a.left + a.width / 2) + "px";
+  el.style.top  = (a.top  + a.height / 2) + "px";
+  document.body.appendChild(el);
+  const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
+  const dy = (b.top  + b.height / 2) - (a.top  + a.height / 2);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.style.transform = "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) scale(.55)";
+    el.style.opacity = "0";
+  }));
+  const h = setTimeout(() => el.remove(), 720);
+  timers.push(h);
+}
+
+/* ---- On honore une mission : la jauge réagit ---- */
+function award(kind, originEl) {
+  const gain = GAIN[kind];
+  const before = earned;
+  earned += gain;
+  doneKinds.add(kind);
+
+  flyBadge(originEl, ecGauge, "+" + gain + " min");
+
+  const h = setTimeout(() => {
+    ecFill.style.width = Math.min(100, (earned / GOAL) * 100) + "%";
+    countUp(ecNum, before, earned, 750);
+    ecGauge.classList.remove("pulse");
+    void ecGauge.offsetWidth;   /* reflow pour rejouer l'impulsion */
+    ecGauge.classList.add("pulse");
+    refreshState();
+  }, 220);
+  timers.push(h);
+}
+
+/* ---- État de la jauge + débloquage de la connexion ---- */
+function refreshState() {
+  const live = earned >= UNLOCK;
+  if (live) {
+    ecState.classList.add("ready");
+    ecStateTxt.textContent = "Internet débloqué — tu peux te connecter";
+    ecGo.classList.add("live");
+    ecGoLabel.textContent = "Se connecter · " + earned + " min";
+    if (!ecGo.dataset.popped) {
+      ecGo.classList.remove("pop");
+      void ecGo.offsetWidth;
+      ecGo.classList.add("pop");
+      ecGo.dataset.popped = "1";
+    }
+  } else {
+    ecState.classList.remove("ready");
+    ecStateTxt.textContent = "Il te manque " + (UNLOCK - earned) + " min pour internet";
+    ecGo.classList.remove("live", "pop");
+    ecGoLabel.textContent = "Fais une mission pour te connecter";
+  }
+}
+
+/* ---- Choix d'une mission ---- */
+ecMissions.querySelectorAll(".ec2-mission").forEach(m => {
+  m.addEventListener("click", () => {
+    const kind = m.dataset.kind;
+    if (doneKinds.has(kind)) return;   /* une fois chacune */
+    ecKicker.textContent = KIND[kind];
+    renderTask(kind);
     ecTask.classList.add("show");
   });
 });
 
-document.getElementById("ecClose").addEventListener("click", closeTask);
-
-function closeTask() {
+document.getElementById("ecClose").addEventListener("click", () => {
   ecTask.classList.remove("show");
-  ecDeals.style.display = "grid";
-  chosen = null;
-}
+  clearRing();
+});
 
-function reward(kind) {
-  earned += GAIN[kind];
-  setWallet();
-  document.getElementById("ecGainNum").textContent = "+" + GAIN[kind];
-  ecTask.classList.remove("show");
-  ecReward.classList.add("show");
-  ecGo.hidden = false;
-  ecGoLabel.textContent = "Se connecter (" + earned + " min)";
-  document.getElementById("ecStatGain").textContent = "+" + earned + " min";
-}
-
+/* ---- Tâches ---- */
 function renderTask(kind) {
+  clearRing();
   if (kind === "quiz") return renderQuiz();
   if (kind === "sponsor") return renderSponsor();
   if (kind === "ref") return renderRef();
 }
 
-/* --- Quiz --- */
+/* QUIZ */
 const QUIZ = {
-  q: "Quel exposant offre le WiFi de l'Arena ?",
+  q: "Pourquoi tu te connectes au WiFi ?",
   opts: [
-    { t: "WariTel — stand A12", ok: true },
-    { t: "SeneMobile — stand B4", ok: false },
-    { t: "Le salon lui-même", ok: false }
+    { t: "Contacter ma famille", ok: true },
+    { t: "Travailler", ok: false },
+    { t: "Me divertir", ok: false }
   ]
 };
 function renderQuiz() {
   ecCardBody.innerHTML = "";
   const q = document.createElement("p");
-  q.className = "ec-q";
+  q.className = "ec2-q";
   q.textContent = QUIZ.q;
   const opts = document.createElement("div");
-  opts.className = "ec-opts";
+  opts.className = "ec2-opts";
   QUIZ.opts.forEach((o, i) => {
     const b = document.createElement("button");
-    b.className = "ec-opt btn-press";
+    b.className = "ec2-opt btn-press";
     b.innerHTML = '<span class="key">' + "ABC"[i] + '</span><span>' + o.t + "</span>";
     b.addEventListener("click", () => {
-      // on fige toutes les options
       [...opts.children].forEach(x => x.disabled = true);
       b.classList.add(o.ok ? "ok" : "no");
       if (o.ok) {
-        setTimeout(() => reward("quiz"), 650);
+        const card = ecMissions.querySelector('[data-kind="quiz"]');
+        card.classList.add("done");
+        closeTaskSoon(650);
+        const h = setTimeout(() => award("quiz", card), 260);
+        timers.push(h);
       } else {
-        // on révèle la bonne réponse
-        [...opts.children].forEach((x, j) => {
-          if (QUIZ.opts[j].ok) x.classList.add("ok");
-        });
-        setTimeout(() => {
-          earned += 0;
-          // pas de gain si mauvaise réponse, mais on laisse recommencer
+        [...opts.children].forEach((x, j) => { if (QUIZ.opts[j].ok) x.classList.add("ok"); });
+        const h = setTimeout(() => {
           [...opts.children].forEach(x => { x.disabled = false; x.classList.remove("ok", "no"); });
-        }, 1400);
+        }, 1500);
+        timers.push(h);
       }
     });
     opts.appendChild(b);
@@ -1116,49 +946,62 @@ function renderQuiz() {
   ecCardBody.append(q, opts);
 }
 
-/* --- Sponsor : anneau de 5s --- */
+/* SPONSOR : anneau de 5s */
+let ringIv = null;
+function clearRing() { if (ringIv) { clearInterval(ringIv); ringIv = null; } }
 function renderSponsor() {
   ecCardBody.innerHTML = "";
   const wrap = document.createElement("div");
-  wrap.className = "ec-ring-wrap";
+  wrap.className = "ec2-ring-wrap";
   const ring = document.createElement("div");
-  ring.className = "ec-ring";
+  ring.className = "ec2-ring";
   ring.innerHTML = '<span class="n"><span class="num mono">5</span><small>SECONDES</small></span>';
   wrap.appendChild(ring);
   const hint = document.createElement("p");
-  hint.className = "ec-hint";
-  hint.style.textAlign = "center";
-  hint.innerHTML = "WariTel, partenaire officiel — <b style='color:#fcd34d'>fibre 10 Gbps</b> déployée pour le salon. C'est tout, pas de formulaire derrière.";
+  hint.className = "ec2-ring-hint";
+  hint.innerHTML = "Notre partenaire <b>WariTel</b> finance ton WiFi. C'est tout — aucun formulaire ensuite.";
   ecCardBody.append(wrap, hint);
 
   let left = 5;
   const num = ring.querySelector(".num");
-  // on déclenche la transition après le paint
   requestAnimationFrame(() => requestAnimationFrame(() => ring.classList.add("go")));
-  const iv = setInterval(() => {
+  clearRing();
+  ringIv = setInterval(() => {
     left--;
     if (left <= 0) {
-      clearInterval(iv);
-      reward("sponsor");
+      clearInterval(ringIv); ringIv = null;
+      const card = ecMissions.querySelector('[data-kind="sponsor"]');
+      card.classList.add("done");
+      closeTaskSoon(500);
+      const h = setTimeout(() => award("sponsor", card), 160);
+      timers.push(h);
       return;
     }
     num.textContent = left;
   }, 1000);
-  timers.push(iv);
+  timers.push(ringIv);
 }
 
-/* --- Parrainage --- */
+/* PARRAINAGE */
 function renderRef() {
   ecCardBody.innerHTML = "";
-  const code = "TERANGA-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+  const code = "PC-" + Math.random().toString(36).slice(2, 6).toUpperCase();
   const box = document.createElement("div");
-  box.className = "ec-ref-code";
+  box.className = "ec2-ref-code";
   box.innerHTML = '<span class="c mono">' + code + '</span>';
   const cp = document.createElement("button");
-  cp.className = "ec-copy btn-press";
+  cp.className = "ec2-copy btn-press";
   cp.textContent = "Copier";
   cp.addEventListener("click", () => {
-    const done = () => { cp.textContent = "✓ Copié"; cp.classList.add("done"); reward("ref"); };
+    const done = () => {
+      cp.textContent = "✓ Copié";
+      cp.classList.add("done");
+      const card = ecMissions.querySelector('[data-kind="ref"]');
+      card.classList.add("done");
+      closeTaskSoon(600);
+      const h = setTimeout(() => award("ref", card), 200);
+      timers.push(h);
+    };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(code).then(done).catch(fallback);
     } else fallback();
@@ -1174,17 +1017,26 @@ function renderRef() {
   });
   box.appendChild(cp);
   const hint = document.createElement("p");
-  hint.className = "ec-hint";
-  hint.textContent = "Ton voisin entre ce code à sa connexion : il gagne 10 min, tu gagnes 15 min. Sans inscription.";
+  hint.className = "ec2-hint";
+  hint.textContent = "Ton proche entre ce code à sa connexion : il gagne 10 min, tu gagnes 15 min.";
   ecCardBody.append(box, hint);
 }
 
-/* --- Connexion finale --- */
+function closeTaskSoon(ms) {
+  const h = setTimeout(() => ecTask.classList.remove("show"), ms);
+  timers.push(h);
+}
+
+/* ---- Connexion finale ---- */
 ecGo.addEventListener("click", () => {
+  if (earned < UNLOCK) return;
   fakeConnect(ecGo, ecGoLabel, "Connexion…", () => {
     ecPortal.style.display = "none";
+    ecCtaWrap.hidden = true;
     ecOn.classList.add("show");
-    // 30 min de base + minutes gagnées
+    const kind = [...doneKinds][0] || "quiz";
+    document.getElementById("ecStatKind").textContent = KIND[kind];
+    document.getElementById("ecStatGain").textContent = "+" + earned + " min";
     runClock(document.getElementById("ecClock"), 30 * 60 + earned * 60);
   });
 });
@@ -1192,7 +1044,6 @@ ecGo.addEventListener("click", () => {
 /* ==================== Resets ==================== */
 function resetAll() {
   clearTimers();
-  // Instant
   insPortal.style.display = "";
   insOn.classList.remove("show");
   insGo.disabled = false;
@@ -1203,25 +1054,31 @@ function resetAll() {
     const p = c.querySelector(".plus"); p.style.color = "";
     p.textContent = { ref: "+15 min", sponsor: "+20 min", quiz: "+10 min" }[c.dataset.offer];
   });
-  // Scène
   scPortal.style.display = "";
   scOn.classList.remove("show");
   scGo.disabled = false;
   scGoLabel.textContent = "Rejoindre le festival";
   document.getElementById("scClock").textContent = "60:00";
-  // Échange
   ecPortal.style.display = "";
   ecOn.classList.remove("show");
-  ecDeals.style.display = "grid";
   ecTask.classList.remove("show");
-  ecReward.classList.remove("show");
-  ecGo.hidden = true;
-  ecGo.disabled = false;
-  ecGoLabel.textContent = "Se connecter";
-  earned = 0; chosen = null;
-  setWallet();
+  ecCardBody.innerHTML = "";
+  earned = 0;
+  doneKinds.clear();
+  ecNum.textContent = "0";
+  ecFill.style.width = "0%";
+  ecGo.classList.remove("live", "pop");
+  ecGo.dataset.popped = "";
+  ecGoLabel.textContent = "Fais une mission pour te connecter";
+  ecState.classList.remove("ready");
+  ecStateTxt.textContent = "Fais 1 mission pour débloquer internet";
+  ecMissions.querySelectorAll(".ec2-mission").forEach(m => m.classList.remove("done"));
   document.getElementById("ecClock").textContent = "30:00";
+  if (!document.getElementById("v-echange").classList.contains("active")) {
+    ecCtaWrap.hidden = true;
+  }
 }
+
 document.querySelectorAll("[data-reset]").forEach(b => {
   b.addEventListener("click", () => {
     clearTimers();
@@ -1234,20 +1091,27 @@ document.querySelectorAll("[data-reset]").forEach(b => {
     } else {
       ecPortal.style.display = "";
       ecOn.classList.remove("show");
-      ecDeals.style.display = "grid";
       ecTask.classList.remove("show");
-      ecReward.classList.remove("show");
-      ecGo.hidden = true;
-      earned = 0; chosen = null;
-      setWallet();
+      ecCardBody.innerHTML = "";
+      earned = 0;
+      doneKinds.clear();
+      ecNum.textContent = "0";
+      ecFill.style.width = "0%";
+      ecGo.classList.remove("live", "pop");
+      ecGo.dataset.popped = "";
+      ecGoLabel.textContent = "Fais une mission pour te connecter";
+      ecState.classList.remove("ready");
+      ecStateTxt.textContent = "Fais 1 mission pour débloquer internet";
+      ecMissions.querySelectorAll(".ec2-mission").forEach(m => m.classList.remove("done"));
       document.getElementById("ecClock").textContent = "30:00";
+      ecCtaWrap.hidden = false;
     }
   });
 });
 
 /* ==================== Init ==================== */
-setWallet();
 pick.style.setProperty("--pick-accent", "#8b5cf6");
+ecCtaWrap.hidden = true;
 </script>
 </body>
 </html>
