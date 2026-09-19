@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#09090b">
+<meta name="theme-color" content="#f5f5fb">
 <title>Portal Lab — 3 portails captifs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,62 +87,202 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
 
 /* ================================================================
-   VARIANTE 1 — INSTANT
+   VARIANTE 1 — INSTANT  ·  parcours complet d'achat
+   Accueil forfaits → Téléphone → Code SMS → Paiement → Accès.
+   Charte PremiumConnect (thème clair). 1 décision par écran.
    ================================================================ */
 #v-instant {
-  --ac: #8b5cf6;
-  background: radial-gradient(120% 60% at 50% -10%, rgba(139,92,246,.14), transparent 60%), #09090b;
-  color: #fafafa; display: none; place-items: center;
-  padding: 24px 20px calc(96px + var(--safe-b));
+  --pc-violet: #5B4DFF;
+  --pc-coral:  #FF4D6A;
+  --pc-ink:    #191933;
+  --pc-bg:     #f5f5fb;
+  --pc-card:   #ffffff;
+  --pc-track:  #e9e9f4;
+  --pc-muted:  #6d6d88;
+  --pc-line:   #e6e6f0;
+
+  --ac: #5B4DFF;
+  background: var(--pc-bg);
+  color: var(--pc-ink);
 }
-#v-instant.active { display: grid; }
-.ins-wrap { width: 100%; max-width: 400px; }
-.ins-mark { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
-.ins-mark .dot {
-  width: 34px; height: 34px; border-radius: 10px;
-  background: linear-gradient(140deg, #8b5cf6, #6d28d9);
-  display: grid; place-items: center; box-shadow: 0 6px 18px -8px rgba(139,92,246,.8);
+#v-instant.active { display: grid; place-items: center; }
+#v-instant .inner { width: 100%; max-width: 430px; margin: 0 auto; padding: calc(20px + var(--safe-t)) 18px calc(110px + var(--safe-b)); }
+
+.in2-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.in2-brand { display: flex; align-items: center; gap: 9px; font-weight: 800; letter-spacing: -.02em; }
+.in2-brand .dot {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  display: grid; place-items: center; box-shadow: 0 6px 16px -6px rgba(91,77,255,.7);
 }
-.ins-mark .dot svg { width: 18px; height: 18px; }
-.ins-mark .ssid { font-size: .9rem; font-weight: 650; }
-.ins-mark .sec { font-size: .72rem; color: rgba(255,255,255,.45); }
-.ins-hero h1 { font-size: clamp(1.7rem, 7vw, 2.1rem); line-height: 1.15; letter-spacing: -.03em; font-weight: 700; }
-.ins-hero h1 em { font-style: normal; color: #c4b5fd; }
-.ins-sub { margin-top: 10px; color: rgba(255,255,255,.55); font-size: .92rem; line-height: 1.6; }
-.ins-connect {
-  margin: 34px 0 14px; width: 100%; padding: 17px 20px; border: 0; border-radius: 20px;
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff;
-  font-size: 1rem; font-weight: 650;
-  box-shadow: 0 12px 30px -12px rgba(139,92,246,.9), inset 0 1px 0 rgba(255,255,255,.25);
-  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px;
+.in2-brand .dot svg { width: 17px; height: 17px; }
+.in2-lang {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: 999px;
+  background: var(--pc-card); border: 1px solid var(--pc-line);
+  font-size: .72rem; font-weight: 700; color: var(--pc-muted);
 }
-.ins-connect:disabled { opacity: .7; }
-.ins-trust { display: flex; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,.4); font-size: .76rem; }
-.ins-trust svg { width: 13px; height: 13px; }
-.ins-on { display: none; text-align: center; padding-top: 8px; }
-.ins-on.show { display: block; }
-.ins-on .ring {
-  width: 76px; height: 76px; margin: 0 auto 20px; border-radius: 50%;
+
+/* ---- vues (étapes) ---- */
+.in2-view { display: none; }
+.in2-view.show { display: block; }
+.in2-view.show .rise {
+  opacity: 1; transform: translateY(0);
+  transition: opacity var(--dur-page) var(--ease-out), transform var(--dur-page) var(--ease-out);
+}
+.in2-view.show .rise { @starting-style { opacity: 0; transform: translateY(12px); } }
+
+/* ---- commun ---- */
+.in2-hero { margin-bottom: 18px; }
+.in2-hero h1 { font-size: clamp(1.6rem, 7vw, 2rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
+.in2-hero h1 b {
+  background: linear-gradient(100deg, var(--pc-violet), var(--pc-coral));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.in2-hero p { margin-top: 8px; color: var(--pc-muted); font-size: .88rem; line-height: 1.5; }
+
+.in2-sec { margin: 20px 0 11px; display: flex; align-items: center; gap: 9px; }
+.in2-sec span { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; color: var(--pc-muted); }
+.in2-sec i { flex: 1; height: 1px; background: var(--pc-line); }
+
+/* ---- forfaits ---- */
+.in2-packs { display: grid; gap: 10px; }
+.in2-pack {
+  position: relative; display: flex; align-items: center; gap: 13px; width: 100%; text-align: left;
+  padding: 15px; border-radius: 18px;
+  background: var(--pc-card); border: 1.5px solid var(--pc-line);
+  box-shadow: 0 4px 14px -10px rgba(25,25,51,.4);
+  transition: transform var(--dur-hover) var(--ease-out),
+              box-shadow var(--dur-hover) var(--ease-out),
+              border-color var(--dur-hover) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .in2-pack:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -14px rgba(91,77,255,.45); border-color: #d9d4ff; }
+}
+.in2-pack:active { transform: scale(.98); }
+.in2-pack.sel { border-color: var(--pc-violet); box-shadow: 0 10px 22px -12px rgba(91,77,255,.6); }
+.in2-pack .badge-free {
+  position: absolute; top: -8px; right: 12px;
+  padding: 3px 10px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff; font-size: .62rem; font-weight: 800; letter-spacing: .04em;
+  box-shadow: 0 5px 12px -5px rgba(91,77,255,.9);
+}
+.in2-pack .ic { width: 42px; height: 42px; flex: none; border-radius: 13px; display: grid; place-items: center; background: rgba(91,77,255,.1); }
+.in2-pack .ic svg { width: 20px; height: 20px; stroke: var(--pc-violet); }
+.in2-pack .t { font-size: .95rem; font-weight: 700; }
+.in2-pack .d { font-size: .74rem; color: var(--pc-muted); margin-top: 2px; line-height: 1.4; }
+.in2-pack .price { margin-left: auto; flex: none; text-align: right; }
+.in2-pack .price .p { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; }
+.in2-pack .price .u { font-size: .66rem; color: var(--pc-muted); font-weight: 700; }
+.in2-pack.free .price .p { color: #0d9b5c; }
+
+/* ---- inputs / keypad ---- */
+.in2-field {
+  width: 100%; padding: 16px 16px; border-radius: 16px;
+  border: 1.5px solid var(--pc-line); background: var(--pc-card);
+  font-size: 1.18rem; font-weight: 700; letter-spacing: .05em;
+  color: var(--pc-ink);
+  transition: border-color var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out);
+}
+.in2-field:focus { outline: none; border-color: var(--pc-violet); box-shadow: 0 0 0 4px rgba(91,77,255,.14); }
+.in2-cc {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 11px;
+  padding: 13px 15px; border-radius: 14px;
+  background: var(--pc-card); border: 1px solid var(--pc-line);
+  font-size: .86rem; font-weight: 700; color: var(--pc-muted);
+}
+.in2-cc .flag { width: 26px; height: 18px; border-radius: 3px; object-fit: cover; }
+.in2-cc b { color: var(--pc-ink); }
+.in2-hint { margin-top: 12px; font-size: .78rem; color: var(--pc-muted); line-height: 1.5; text-align: center; }
+.in2-hint.code { font-size: .82rem; }
+
+.in2-keys { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.in2-key {
+  padding: 15px 0; border: 0; border-radius: 15px;
+  background: var(--pc-card); border: 1px solid var(--pc-line);
+  font-size: 1.28rem; font-weight: 700; color: var(--pc-ink);
+  box-shadow: 0 3px 8px -5px rgba(25,25,51,.35);
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-press) var(--ease-out);
+}
+.in2-key:active { transform: scale(.94); background: var(--pc-track); }
+.in2-key.fn { color: var(--pc-muted); font-size: .9rem; }
+.in2-key.fn:active { color: var(--pc-coral); background: rgba(255,77,106,.09); }
+
+/* ---- méthodes de paiement ---- */
+.in2-sum {
+  padding: 15px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(91,77,255,.09), rgba(255,77,106,.06));
+  border: 1px solid #ddd8ff;
+}
+.in2-sum .r { display: flex; align-items: center; justify-content: space-between; font-size: .86rem; }
+.in2-sum .r + .r { margin-top: 8px; }
+.in2-sum .r span { color: var(--pc-muted); font-weight: 600; }
+.in2-sum .r b { font-weight: 800; }
+.in2-sum .tot { border-top: 1px dashed #cfc9f5; margin-top: 11px; padding-top: 11px; }
+.in2-sum .tot b { font-size: 1.15rem; }
+
+.in2-pays { display: grid; gap: 9px; }
+.in2-pay {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  padding: 13px 14px; border-radius: 15px;
+  border: 1.5px solid var(--pc-line); background: var(--pc-card);
+  transition: border-color var(--dur-hover) var(--ease-out), background-color var(--dur-hover) var(--ease-out), transform var(--dur-hover) var(--ease-out);
+}
+.in2-pay:active { transform: scale(.98); }
+.in2-pay.sel { border-color: var(--pc-violet); background: rgba(91,77,255,.05); }
+.in2-pay .logo { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center; font-weight: 800; font-size: .86rem; color: #fff; }
+.in2-pay .nm { font-size: .9rem; font-weight: 700; }
+.in2-pay .sub { font-size: .72rem; color: var(--pc-muted); margin-top: 1px; }
+.in2-pay .tick {
+  margin-left: auto; width: 21px; height: 21px; flex: none; border-radius: 50%;
+  border: 1.5px solid var(--pc-line); display: grid; place-items: center;
+  transition: background var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out);
+}
+.in2-pay.sel .tick { background: var(--pc-violet); border-color: var(--pc-violet); }
+.in2-pay .tick svg { width: 11px; height: 11px; stroke: #fff; opacity: 0; }
+.in2-pay.sel .tick svg { opacity: 1; }
+
+/* ---- CTA primaire ---- */
+.in2-cta { margin-top: 20px; }
+.in2-build {
+  width: 100%; min-height: 58px; border: 0; border-radius: 18px;
+  background: var(--pc-track); color: var(--pc-muted);
+  font-size: 1rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  transition: background var(--dur-hover) var(--ease-out), color var(--dur-hover) var(--ease-out),
+              transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out);
+}
+.in2-build.live {
+  background: linear-gradient(135deg, var(--pc-violet), var(--pc-coral));
+  color: #fff;
+  box-shadow: 0 14px 30px -12px rgba(91,77,255,.85), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.in2-build.live:active { transform: scale(.97); }
+.in2-build.pop { animation: cpop 380ms var(--ease-pop); }
+@keyframes cpop { 0% { transform: scale(.94); } 55% { transform: scale(1.025); } 100% { transform: scale(1); } }
+
+/* ---- accès ---- */
+.in2-on { text-align: center; padding-top: 6vh; }
+.in2-on .ring {
+  width: 84px; height: 84px; margin: 0 auto 22px; border-radius: 50%;
   display: grid; place-items: center;
-  background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.35);
+  background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.4);
 }
-.ins-on .ring svg { width: 34px; height: 34px; stroke: #34d399; }
-.ins-on h2 { font-size: 1.35rem; letter-spacing: -.025em; font-weight: 700; }
-.ins-on .time { margin-top: 6px; font-size: .9rem; color: rgba(255,255,255,.55); }
-.ins-on .time b { color: #34d399; font-weight: 650; }
-.ins-offers { margin-top: 30px; text-align: left; }
-.ins-offers .lbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.38); margin-bottom: 10px; }
-.ins-offers .card {
-  display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px;
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09);
-  margin-bottom: 8px; text-align: left; width: 100%;
-  transition: background-color var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out), transform var(--dur-hover) var(--ease-out);
+.in2-on .ring svg { width: 38px; height: 38px; stroke: #0d9b5c; }
+.in2-on h2 { font-size: clamp(1.5rem, 6.5vw, 1.9rem); letter-spacing: -.03em; font-weight: 800; }
+.in2-on .meta { margin-top: 10px; color: var(--pc-muted); font-size: .9rem; }
+.in2-on .row { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; }
+.in2-on .stat { padding: 13px; border-radius: 16px; background: var(--pc-card); border: 1px solid var(--pc-line); }
+.in2-on .stat .k { font-size: .64rem; text-transform: uppercase; letter-spacing: .1em; color: var(--pc-muted); font-weight: 700; }
+.in2-on .stat .v { font-size: 1.05rem; font-weight: 800; margin-top: 3px; }
+.in2-reset {
+  margin-top: 24px; border: 1px solid var(--pc-line); background: var(--pc-card);
+  color: var(--pc-muted); padding: 11px 18px; border-radius: 13px;
+  font-size: .84rem; font-weight: 700;
+  transition: color var(--dur-hover) var(--ease-out), background-color var(--dur-hover) var(--ease-out);
 }
-.ins-offers .card .ic { width: 36px; height: 36px; flex: none; border-radius: 10px; background: rgba(139,92,246,.14); display: grid; place-items: center; }
-.ins-offers .card .ic svg { width: 17px; height: 17px; stroke: #c4b5fd; }
-.ins-offers .card .t { font-size: .9rem; font-weight: 600; }
-.ins-offers .card .d { font-size: .78rem; color: rgba(255,255,255,.48); margin-top: 2px; line-height: 1.45; }
-.ins-offers .card .plus { margin-left: auto; font-size: .76rem; font-weight: 700; color: #34d399; flex: none; }
+.in2-reset:active { transform: scale(.97); }
 
 /* ================================================================
    VARIANTE 2 — SCÈNE
@@ -429,7 +569,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .ec2-connect.live:active { transform: scale(.97); }
 .ec2-connect.pop { animation: cpop 380ms var(--ease-pop); }
-@keyframes cpop { 0% { transform: scale(.94); } 55% { transform: scale(1.025); } 100% { transform: scale(1); } }
 
 /* ============ Badge volant ("+20 min" → jauge) ============ */
 .fly {
@@ -472,11 +611,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+.in2-build:not(.live) .spinner,
 .ec2-connect:not(.live) .spinner { border-color: rgba(25,25,51,.2); border-top-color: var(--pc-muted); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-  .variant.active .rise, .sc-on .curtain, .ins-on, .ec2-task, .ec2-on { transform: none !important; }
+  .variant.active .rise, .sc-on .curtain, .ec2-task, .ec2-on, .in2-view.show .rise { transform: none !important; }
   .ec2-ring, .fly { transition: none !important; }
   .fly { opacity: 0 !important; }
 }
@@ -486,7 +626,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 <!-- =================== CHROME =================== -->
 <nav id="picker" aria-label="Choisir un prototype">
-  <button data-v="instant" aria-selected="true" style="--pick-accent:#8b5cf6">
+  <button data-v="instant" aria-selected="true" style="--pick-accent:#5B4DFF">
     <span class="num">01</span><span class="nm">Instant</span>
   </button>
   <button data-v="scene" aria-selected="false" style="--pick-accent:#f59e0b">
@@ -500,48 +640,156 @@ button { font: inherit; color: inherit; cursor: pointer; }
 <div id="app">
 
 <!-- ================================================================
-     VARIANTE 1 — INSTANT
+     VARIANTE 1 — INSTANT · parcours complet d'achat
+     Accueil forfaits → Téléphone → Code SMS → Paiement → Accès.
      ================================================================ -->
 <section id="v-instant" class="variant active">
-  <div class="ins-wrap">
-    <div class="ins-portal rise" id="insPortal">
-      <div class="ins-mark">
+  <div class="inner">
+
+    <div class="in2-top">
+      <span class="in2-brand">
         <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.4" fill="#fff" stroke="none"/></svg></span>
-        <span><span class="ssid">Salon Pro WiFi</span><br><span class="sec">Réseau sécurisé · Hall principal</span></span>
-      </div>
-      <div class="ins-hero">
-        <h1>Internet en<br><em>un geste.</em></h1>
-        <p class="ins-sub">Aucun formulaire, aucune attente. Touche, tu es connecté. Les bonus arrivent après — jamais avant.</p>
-      </div>
-      <button class="ins-connect btn-press" id="insGo"><span id="insGoLabel">Se connecter</span></button>
-      <div class="ins-trust">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <span>Connexion chiffrée · 60 min offertes</span>
-      </div>
+        PremiumConnect
+      </span>
+      <span class="in2-lang">FR</span>
     </div>
-    <div class="ins-on" id="insOn">
-      <div class="ring rise"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <h2 class="rise">Tu es connecté</h2>
-      <p class="time rise">Il te reste <b class="mono" id="insClock">60:00</b> de connexion</p>
-      <div class="ins-offers rise" id="insOffers">
-        <p class="lbl">Étends ton temps — quand tu veux</p>
-        <button class="card btn-press" data-offer="ref">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 12h13M12 5l7 7-7 7"/></svg></span>
-          <span><span class="t">Inviter un collègue</span><span class="d">Partage le WiFi, +15 min pour toi</span></span>
-          <span class="plus">+15 min</span>
-        </button>
-        <button class="card btn-press" data-offer="sponsor">
+
+    <!-- 1 · ACCUEIL -->
+    <div class="in2-view show rise" id="inHome">
+      <div class="in2-hero">
+        <h1>Choisis ton<br><b>forfait internet</b></h1>
+        <p>Prix affiché, durée affichée. Aucune surprise au paiement.</p>
+      </div>
+      <div class="in2-packs" id="inPacks">
+        <button class="in2-pack btn-press free" data-id="free" data-min="20" data-price="0" data-name="Gratuit" data-unit="20 min">
+          <span class="badge-free">SPONSOR</span>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-2.8L7 19l1-6-4-4 5.5-.5z"/></svg></span>
-          <span><span class="t">Découvrir le sponsor</span><span class="d">2 min sur l'exposant A12, +20 min</span></span>
-          <span class="plus">+20 min</span>
+          <span><span class="t">Gratuit</span><span class="d">20 min · regarde 5s le sponsor</span></span>
+          <span class="price"><span class="p">0 F</span><span class="u">20 min</span></span>
         </button>
-        <button class="card btn-press" data-offer="quiz">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></span>
-          <span><span class="t">Répondre au quiz</span><span class="d">1 question sur le salon, +10 min</span></span>
-          <span class="plus">+10 min</span>
+        <button class="in2-pack btn-press" data-id="h1" data-min="60" data-price="200" data-name="1 heure" data-unit="1 heure">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
+          <span><span class="t">1 heure</span><span class="d">Idéal pour un passage rapide</span></span>
+          <span class="price"><span class="p">200 F</span><span class="u">60 min</span></span>
+        </button>
+        <button class="in2-pack btn-press" data-id="d1" data-min="1440" data-price="500" data-name="24 heures" data-unit="24 heures">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 3v3M5.5 8.5L7 10M18.5 8.5L17 10"/><circle cx="12" cy="18" r="9"/></svg></span>
+          <span><span class="t">24 heures</span><span class="d">Le plus choisi en événement</span></span>
+          <span class="price"><span class="p">500 F</span><span class="u">1 jour</span></span>
+        </button>
+        <button class="in2-pack btn-press" data-id="w7" data-min="10080" data-price="2000" data-name="7 jours" data-unit="7 jours">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+          <span><span class="t">7 jours</span><span class="d">Salons, festivals, longue durée</span></span>
+          <span class="price"><span class="p">2000 F</span><span class="u">7 jours</span></span>
         </button>
       </div>
+      <div class="in2-cta">
+        <button class="in2-build" id="inBuild"><span id="inBuildLabel">Choisis un forfait</span></button>
+        <p class="in2-hint">Paiement sécurisé · reçu par SMS · sans engagement</p>
+      </div>
     </div>
+
+    <!-- 2 · TÉLÉPHONE -->
+    <div class="in2-view rise" id="inPhone">
+      <div class="in2-hero">
+        <h1>Ton<br><b>numéro de téléphone</b></h1>
+        <p>C'est ton compte. On t'envoie un code par SMS pour confirmer.</p>
+      </div>
+      <div class="in2-cc">
+        <img class="flag" alt="Sénégal" src="https://flagcdn.com/w40/sn.png">
+        <b>+221</b>
+        <span>· Sénégal</span>
+      </div>
+      <input class="in2-field mono" id="inPhoneInput" inputmode="numeric" autocomplete="tel"
+             placeholder="77 123 45 67" maxlength="12" readonly aria-label="Numéro de téléphone">
+      <div class="in2-keys" id="inKeys">
+        <button class="in2-key btn-press" type="button" data-k="1">1</button>
+        <button class="in2-key btn-press" type="button" data-k="2">2</button>
+        <button class="in2-key btn-press" type="button" data-k="3">3</button>
+        <button class="in2-key btn-press" type="button" data-k="4">4</button>
+        <button class="in2-key btn-press" type="button" data-k="5">5</button>
+        <button class="in2-key btn-press" type="button" data-k="6">6</button>
+        <button class="in2-key btn-press" type="button" data-k="7">7</button>
+        <button class="in2-key btn-press" type="button" data-k="8">8</button>
+        <button class="in2-key btn-press" type="button" data-k="9">9</button>
+        <button class="in2-key fn btn-press" type="button" id="inBack">⌫</button>
+        <button class="in2-key btn-press" type="button" data-k="0">0</button>
+        <button class="in2-key fn btn-press" type="button" id="inNext">Suivant</button>
+      </div>
+      <p class="in2-hint">Aucun mot de passe à retenir. Ton numéro suffit.</p>
+    </div>
+
+    <!-- 3 · CODE SMS -->
+    <div class="in2-view rise" id="inCode">
+      <div class="in2-hero">
+        <h1>Code de<br><b>confirmation</b></h1>
+        <p>On a envoyé un code à 4 chiffres au <b id="inCodePhone" class="mono"></b></p>
+      </div>
+      <input class="in2-field mono" id="inCodeInput" inputmode="numeric" autocomplete="one-time-code"
+             placeholder="• • • •" maxlength="4" readonly aria-label="Code de confirmation">
+      <div class="in2-keys" id="inCodeKeys">
+        <button class="in2-key btn-press" type="button" data-k="1">1</button>
+        <button class="in2-key btn-press" type="button" data-k="2">2</button>
+        <button class="in2-key btn-press" type="button" data-k="3">3</button>
+        <button class="in2-key btn-press" type="button" data-k="4">4</button>
+        <button class="in2-key btn-press" type="button" data-k="5">5</button>
+        <button class="in2-key btn-press" type="button" data-k="6">6</button>
+        <button class="in2-key btn-press" type="button" data-k="7">7</button>
+        <button class="in2-key btn-press" type="button" data-k="8">8</button>
+        <button class="in2-key btn-press" type="button" data-k="9">9</button>
+        <button class="in2-key fn btn-press" type="button" id="inCodeBack">⌫</button>
+        <button class="in2-key btn-press" type="button" data-k="0">0</button>
+        <button class="in2-key fn btn-press" type="button" id="inCodeNext">OK</button>
+      </div>
+      <p class="in2-hint code">Pas reçu ? <button id="inResend" style="border:0;background:none;color:var(--pc-violet);font-weight:700;font:inherit">Renvoyer le code</button></p>
+    </div>
+
+    <!-- 4 · PAIEMENT -->
+    <div class="in2-view rise" id="inPay">
+      <div class="in2-hero">
+        <h1>Règle ton<br><b>forfait</b></h1>
+        <p>Un seul écran, un seul geste. Tu vois le montant exact avant de valider.</p>
+      </div>
+      <div class="in2-sum" id="inSummary"></div>
+      <div class="in2-sec"><span>Mode de paiement</span><i></i></div>
+      <div class="in2-pays" id="inPays">
+        <button class="in2-pay btn-press sel" data-m="Wave">
+          <span class="logo" style="background:#1DC8FF">W</span>
+          <span><span class="nm">Wave</span><span class="sub">Recommandé · sans frais</span></span>
+          <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+        </button>
+        <button class="in2-pay btn-press" data-m="Orange Money">
+          <span class="logo" style="background:#FF7900">OM</span>
+          <span><span class="nm">Orange Money</span><span class="sub">Tous comptes Orange</span></span>
+          <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+        </button>
+        <button class="in2-pay btn-press" data-m="Free Money">
+          <span class="logo" style="background:#CD0067">FM</span>
+          <span><span class="nm">Free Money</span><span class="sub">Tous comptes Free</span></span>
+          <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+        </button>
+      </div>
+      <div class="in2-cta">
+        <button class="in2-build live btn-press" id="inPayBtn"><span id="inPayLabel">Payer 500 F</span></button>
+        <p class="in2-hint">Ton forfait s'active tout seul après la validation.</p>
+      </div>
+    </div>
+
+    <!-- 5 · ACCÈS -->
+    <div class="in2-view rise" id="inDone">
+      <div class="in2-on">
+        <div class="ring rise"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h2 class="rise">Tu es connecté</h2>
+        <p class="meta rise">Forfait <b id="inPackName">24 heures</b> actif</p>
+        <p class="meta rise mono" style="font-size:1.05rem"><b id="inClock">23:59:58</b></p>
+        <div class="row rise">
+          <div class="stat"><p class="k">Numéro</p><p class="v mono" id="inStatPhone">+221 •••</p></div>
+          <div class="stat"><p class="k">Reçu</p><p class="v" id="inStatAmt">500 F</p></div>
+        </div>
+        <button class="in2-reset btn-press" id="inReset">↺ Refaire le parcours</button>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -584,7 +832,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
           <p class="v mono">TG-2026-7F4K</p>
           <p class="s">Sert aussi de tirage au sort samedi 21h</p>
         </div>
-        <button class="reset btn-press" data-reset="scene">↺ Refaire le portail</button>
+        <button class="ec2-reset btn-press" data-reset="scene">↺ Refaire le portail</button>
       </div>
     </div>
   </div>
@@ -704,7 +952,7 @@ function switchVariant(name) {
   pickerBtns.forEach(b => b.setAttribute("aria-selected", String(b.dataset.v === name)));
   resetAll();
   const ac = getComputedStyle(document.getElementById("v-" + name)).getPropertyValue("--ac").trim();
-  pick.style.setProperty("--pick-accent", ac || "#8b5cf6");
+  pick.style.setProperty("--pick-accent", ac || "#5B4DFF");
   const cta = document.getElementById("ecCtaWrap");
   if (cta) cta.hidden = (name !== "echange");
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -717,11 +965,12 @@ function clearTimers() { timers.forEach(t => { clearInterval(t); clearTimeout(t)
 function runClock(el, secondsLeft) {
   if (!el) return;
   const handle = setInterval(() => {
-    if (secondsLeft <= 0) { el.textContent = "00:00"; clearInterval(handle); return; }
+    if (secondsLeft <= 0) { el.textContent = "00:00:00"; clearInterval(handle); return; }
     secondsLeft--;
-    const m = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
+    const h = String(Math.floor(secondsLeft / 3600)).padStart(2, "0");
+    const m = String(Math.floor((secondsLeft % 3600) / 60)).padStart(2, "0");
     const s = String(secondsLeft % 60).padStart(2, "0");
-    el.textContent = m + ":" + s;
+    el.textContent = h + ":" + m + ":" + s;
   }, 1000);
   timers.push(handle);
 }
@@ -743,28 +992,157 @@ function fakeConnect(btn, label, doneLabel, cb) {
   timers.push(h);
 }
 
-/* ==================== V1 — INSTANT ==================== */
-const insGo = document.getElementById("insGo");
-const insGoLabel = document.getElementById("insGoLabel");
-const insPortal = document.getElementById("insPortal");
-const insOn = document.getElementById("insOn");
+/* ==================== V1 — INSTANT : parcours d'achat ==================== */
+const inViews   = document.querySelectorAll("#v-instant .in2-view");
+const inPacks   = document.getElementById("inPacks");
+const inBuild   = document.getElementById("inBuild");
+const inBuildL  = document.getElementById("inBuildLabel");
+const inPhoneI  = document.getElementById("inPhoneInput");
+const inCodeI   = document.getElementById("inCodeInput");
+const inCodePh  = document.getElementById("inCodePhone");
+const inSummary = document.getElementById("inSummary");
+const inPayBtn  = document.getElementById("inPayBtn");
+const inPayL    = document.getElementById("inPayLabel");
 
-insGo.addEventListener("click", () => {
-  fakeConnect(insGo, insGoLabel, "Connexion…", () => {
-    insPortal.style.display = "none";
-    insOn.classList.add("show");
-    runClock(document.getElementById("insClock"), 60 * 60);
+let pack = null;
+let phone = "";
+let code  = "";
+let payMethod = "Wave";
+
+function showView(id) {
+  inViews.forEach(v => v.classList.toggle("show", v.id === id));
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+
+/* ---- Étape 1 : forfaits ---- */
+inPacks.querySelectorAll(".in2-pack").forEach(c => {
+  c.addEventListener("click", () => {
+    inPacks.querySelectorAll(".in2-pack").forEach(x => x.classList.remove("sel"));
+    c.classList.add("sel");
+    pack = {
+      id: c.dataset.id, name: c.dataset.name, unit: c.dataset.unit,
+      min: +c.dataset.min, price: +c.dataset.price
+    };
+    inBuild.classList.add("live");
+    inBuildL.textContent = pack.price === 0
+      ? "Continuer · " + pack.unit
+      : "Acheter " + pack.name + " · " + pack.price + " F";
+    inBuild.classList.remove("pop");
+    void inBuild.offsetWidth;
+    inBuild.classList.add("pop");
   });
 });
 
-document.querySelectorAll("#insOffers .card").forEach(c => {
-  c.addEventListener("click", () => {
-    const plus = c.querySelector(".plus");
-    plus.textContent = "✓ Fait";
-    plus.style.color = "#c4b5fd";
-    c.disabled = true;
-    c.style.opacity = ".55";
+inBuild.addEventListener("click", () => {
+  if (!pack) return;
+  phone = ""; code = "";
+  inPhoneI.value = "";
+  inCodeI.value = "";
+  showView("inPhone");
+});
+
+/* ---- Étape 2 : téléphone (clavier tactile) ---- */
+function pressDigit(d) {
+  if (phone.length >= 9) return;
+  phone += d;
+  inPhoneI.value = phone.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+  if (phone.length === 9) {
+    const h = setTimeout(() => goCode(), 380);
+    timers.push(h);
+  }
+}
+function backspace() {
+  if (!phone) return;
+  phone = phone.slice(0, -1);
+  inPhoneI.value = phone.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+}
+function goCode() {
+  if (phone.length !== 9) return;
+  inCodePh.textContent = "+221 " + phone.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+  showView("inCode");
+}
+document.querySelectorAll("#inKeys .in2-key[data-k]").forEach(b => {
+  b.addEventListener("click", () => pressDigit(b.dataset.k));
+});
+document.getElementById("inBack").addEventListener("click", backspace);
+document.getElementById("inNext").addEventListener("click", goCode);
+
+/* ---- Étape 3 : code SMS ---- */
+function pressCodeDigit(d) {
+  if (code.length >= 4) return;
+  code += d;
+  inCodeI.value = code;
+  if (code.length === 4) {
+    const h = setTimeout(() => goPay(), 350);
+    timers.push(h);
+  }
+}
+function codeBackspace() {
+  if (!code) return;
+  code = code.slice(0, -1);
+  inCodeI.value = code;
+}
+function goPay() {
+  if (code.length !== 4) return;
+  if (pack.price === 0) return grantAccess();   /* forfait gratuit : pas de paiement */
+  inSummary.innerHTML =
+    '<div class="r"><span>Forfait</span><b>' + pack.name + '</b></div>' +
+    '<div class="r"><span>Durée</span><b>' + pack.unit + '</b></div>' +
+    '<div class="r"><span>Numéro</span><b class="mono">+221 ' + phone + '</b></div>' +
+    '<div class="r tot"><span>Total à payer</span><b>' + pack.price + ' F</b></div>';
+  inPayL.textContent = "Payer " + pack.price + " F";
+  showView("inPay");
+}
+document.querySelectorAll("#inCodeKeys .in2-key[data-k]").forEach(b => {
+  b.addEventListener("click", () => pressCodeDigit(b.dataset.k));
+});
+document.getElementById("inCodeBack").addEventListener("click", codeBackspace);
+document.getElementById("inCodeNext").addEventListener("click", goPay);
+
+/* Renvoi de code (simulé) */
+document.getElementById("inResend").addEventListener("click", (e) => {
+  const b = e.currentTarget;
+  b.textContent = "Code renvoyé ✓";
+  b.disabled = true;
+  const h = setTimeout(() => { b.textContent = "Renvoyer le code"; b.disabled = false; }, 2500);
+  timers.push(h);
+});
+
+/* ---- Étape 4 : paiement ---- */
+document.querySelectorAll("#inPays .in2-pay").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("#inPays .in2-pay").forEach(x => x.classList.remove("sel"));
+    b.classList.add("sel");
+    payMethod = b.dataset.m;
   });
+});
+
+inPayBtn.addEventListener("click", () => {
+  if (!pack) return;
+  fakeConnect(inPayBtn, inPayL, "Connexion à " + payMethod + "…", () => {
+    inPayL.textContent = "Payer " + pack.price + " F";
+    grantAccess();
+  });
+});
+
+/* ---- Étape 5 : accès ---- */
+function grantAccess() {
+  document.getElementById("inPackName").textContent = pack.name;
+  document.getElementById("inStatPhone").textContent = "+221 " + phone.slice(0, 3) + " " + phone.slice(3, 5) + " " + phone.slice(5, 7) + " " + phone.slice(7);
+  document.getElementById("inStatAmt").textContent = pack.price === 0 ? "Gratuit" : pack.price + " F";
+  showView("inDone");
+  runClock(document.getElementById("inClock"), pack.min * 60);
+}
+
+document.getElementById("inReset").addEventListener("click", () => {
+  clearTimers();
+  pack = null; phone = ""; code = "";
+  inPacks.querySelectorAll(".in2-pack").forEach(x => x.classList.remove("sel"));
+  inBuild.classList.remove("live", "pop");
+  inBuildL.textContent = "Choisis un forfait";
+  inPhoneI.value = ""; inCodeI.value = "";
+  document.getElementById("inClock").textContent = "00:00:00";
+  showView("inHome");
 });
 
 /* ==================== V2 — SCÈNE ==================== */
@@ -1044,21 +1422,22 @@ ecGo.addEventListener("click", () => {
 /* ==================== Resets ==================== */
 function resetAll() {
   clearTimers();
-  insPortal.style.display = "";
-  insOn.classList.remove("show");
-  insGo.disabled = false;
-  insGoLabel.textContent = "Se connecter";
-  document.getElementById("insClock").textContent = "60:00";
-  document.querySelectorAll("#insOffers .card").forEach(c => {
-    c.disabled = false; c.style.opacity = "";
-    const p = c.querySelector(".plus"); p.style.color = "";
-    p.textContent = { ref: "+15 min", sponsor: "+20 min", quiz: "+10 min" }[c.dataset.offer];
-  });
+  /* Instant */
+  pack = null; phone = ""; code = "";
+  inPacks.querySelectorAll(".in2-pack").forEach(x => x.classList.remove("sel"));
+  inBuild.classList.remove("live", "pop");
+  inBuildL.textContent = "Choisis un forfait";
+  inPhoneI.value = ""; inCodeI.value = "";
+  document.getElementById("inClock").textContent = "00:00:00";
+  inPayL.textContent = "Payer";
+  showView("inHome");
+  /* Scène */
   scPortal.style.display = "";
   scOn.classList.remove("show");
   scGo.disabled = false;
   scGoLabel.textContent = "Rejoindre le festival";
   document.getElementById("scClock").textContent = "60:00";
+  /* Échange */
   ecPortal.style.display = "";
   ecOn.classList.remove("show");
   ecTask.classList.remove("show");
@@ -1110,7 +1489,7 @@ document.querySelectorAll("[data-reset]").forEach(b => {
 });
 
 /* ==================== Init ==================== */
-pick.style.setProperty("--pick-accent", "#8b5cf6");
+pick.style.setProperty("--pick-accent", "#5B4DFF");
 ecCtaWrap.hidden = true;
 </script>
 </body>
